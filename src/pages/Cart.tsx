@@ -46,7 +46,7 @@ const Cart = () => {
                       {product.name}
                     </h3>
                   </Link>
-                  <p className="text-xs text-muted-foreground">{product.merchant}</p>
+                  <p className="text-xs text-muted-foreground">{product.description}</p>
                   <p className="font-display font-bold text-primary mt-1">{formatPrice(product.price)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <div className="flex items-center border border-border rounded-md">

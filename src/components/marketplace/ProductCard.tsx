@@ -6,6 +6,8 @@ import { Product, formatPrice } from "@/data/mock-data";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 
+const VITE_IMAGE = import.meta.env.VITE_IMAGE || "";
+
 interface ProductCardProps {
   product: Product;
 }
@@ -26,7 +28,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         {/* Image */}
         <div className="relative aspect-square overflow-hidden bg-muted">
           <img
-            src={product.image}
+            src={`${VITE_IMAGE}${product.image}`}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"

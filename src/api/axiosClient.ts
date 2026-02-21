@@ -18,6 +18,7 @@ axiosClient.interceptors.request.use((config) => {
     "/product",
     "/login",
     "/register",
+    "/orders",
   ];
 
   const isPublic = publicEndpoints.some((path) =>
@@ -39,7 +40,7 @@ axiosClient.interceptors.response.use(
     const token = localStorage.getItem("mc_token");
     const url = error.config?.url || "";
 
-    const protectedEndpoints = ["/orders", "/checkout", "/loyalty"];
+    const protectedEndpoints = ["/checkout", "/loyalty"];
 
     const isProtected = protectedEndpoints.some((p) =>
       url.includes(p)

@@ -10,36 +10,47 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { MapPin, CreditCard, CheckCircle2, ArrowLeft, ArrowRight, Phone, Loader2 } from "lucide-react";
+import { Order } from "@/data/mock-data";
 
 type Step = "address" | "summary" | "payment" | "confirmation";
-
+const VITE_IMAGE = import.meta.env.VITE_IMAGE || "";
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState<Step>("address");
   const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
   const [momoNumber, setMomoNumber] = useState("");
   const [momoProvider, setMomoProvider] = useState("orange");
   const [loading, setLoading] = useState(false);
-  const [orderId, setOrderId] = useState("");
+  const [orderId, setOrderId] = useState<string>(""); // pour afficher la confirmation
 
-  if (!isAuthenticated) {
-    return (
-      <MarketplaceLayout>
-        <div className="container py-16 text-center space-y-4">
-          <h2 className="font-display font-bold text-2xl text-foreground">Connexion requise</h2>
-          <p className="text-muted-foreground">Veuillez vous connecter pour passer commande.</p>
-          <Button onClick={() => navigate("/login")} className="marketplace-gradient text-primary-foreground border-0 font-semibold">
-            Se connecter
-          </Button>
-        </div>
-      </MarketplaceLayout>
-    );
-  }
+if (isLoading) {
+  // On peut afficher un loader ou rien du tout
+  return (
+    <MarketplaceLayout>
+      <div className="container py-16 text-center">
+        <Loader2 className="animate-spin mx-auto h-8 w-8 text-primary" />
+      </div>
+    </MarketplaceLayout>
+  );
+}
+
+if (!isAuthenticated && !isLoading) {
+  return (
+    <MarketplaceLayout>
+      <div className="container py-16 text-center space-y-4">
+        <h2 className="font-display font-bold text-2xl text-foreground">Connexion requise</h2>
+        <p className="text-muted-foreground">Veuillez vous connecter pour passer commande.</p>
+        <Button onClick={() => navigate("/login")} className="marketplace-gradient text-primary-foreground border-0 font-semibold">
+          Se connecter
+        </Button>
+      </div>
+    </MarketplaceLayout>
+  );
+}
 
   if (items.length === 0 && step !== "confirmation") {
     navigate("/cart");
@@ -47,27 +58,36 @@ const Checkout = () => {
   }
 
   const handlePlaceOrder = async () => {
-    setLoading(true);
-    // Simulate Mobile Money payment delay
-    await new Promise((r) => setTimeout(r, 2000));
-    try {
-      const order = await orderService.createOrder({
-        items,
-        address: `${address}, ${city}`,
-        phone,
-        paymentMethod: `Mobile Money ${momoProvider.toUpperCase()} - ${momoNumber}`,
-        total: totalPrice,
-      });
-      setOrderId(order.id);
-      clearCart();
-      setStep("confirmation");
-      toast.success("Commande passée avec succès !");
-    } catch (err: any) {
-      toast.error(err.message || "Erreur lors de la commande");
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    // Préparer le payload pour orderService
+    const operator = momoProvider.toUpperCase() as "MVOLA" | "ORANGEMONEY" | "AIRTELMONEY";
+    const orderPayload: Order = {
+      status: "PENDING", // ou autre statut par défaut
+      userId: Number(user.id), // récupère l'id réel de l'utilisateur connecté si tu as le contexte
+      address: address,
+      phone: phone,
+      paymentMethod: operator,
+      items: items.map(({ product, quantity }) => ({
+        productId: Number(product.id),
+        quantity: quantity,
+        price: product.price,
+      })),
+    };
+
+    const order = await orderService.create(orderPayload);
+    setOrderId(order.id.toString());
+    const token = localStorage.getItem("token"); // récupérer avant de clear
+    clearCart();
+    localStorage.setItem("token", token!); 
+    setStep("confirmation");
+    toast.success("Commande passée avec succès !");
+  } catch (err: any) {
+    toast.error(err.message || "Erreur lors de la commande");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const steps: { key: Step; label: string; icon: React.ReactNode }[] = [
     { key: "address", label: "Adresse", icon: <MapPin className="h-4 w-4" /> },
@@ -108,10 +128,6 @@ const Checkout = () => {
                 <Input placeholder="Lot II B 45, Analakely" value={address} onChange={(e) => setAddress(e.target.value)} required maxLength={200} />
               </div>
               <div className="space-y-2">
-                <Label>Ville</Label>
-                <Input placeholder="Antananarivo" value={city} onChange={(e) => setCity(e.target.value)} required maxLength={100} />
-              </div>
-              <div className="space-y-2">
                 <Label>Téléphone</Label>
                 <Input placeholder="034 00 000 00" value={phone} onChange={(e) => setPhone(e.target.value)} required maxLength={20} />
               </div>
@@ -122,7 +138,7 @@ const Checkout = () => {
               </Button>
               <Button
                 className="marketplace-gradient text-primary-foreground border-0 font-semibold"
-                disabled={!address.trim() || !city.trim() || !phone.trim()}
+                disabled={!address.trim() || !phone.trim()}
                 onClick={() => setStep("summary")}
               >
                 Continuer <ArrowRight className="h-4 w-4 ml-2" />
@@ -138,7 +154,7 @@ const Checkout = () => {
             <div className="space-y-3">
               {items.map(({ product, quantity }) => (
                 <div key={product.id} className="flex items-center gap-3 p-3 border border-border rounded-lg">
-                  <img src={product.image} alt={product.name} className="w-14 h-14 rounded-md object-cover" />
+                  <img src={`${VITE_IMAGE}${product.image}`} alt={product.name} className="w-14 h-14 rounded-md object-cover" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
                     <p className="text-xs text-muted-foreground">Qté: {quantity}</p>
@@ -150,7 +166,7 @@ const Checkout = () => {
             <div className="border-t border-border pt-4 space-y-2 text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>Livraison à</span>
-                <span className="text-foreground">{address}, {city}</span>
+                <span className="text-foreground">{address}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Téléphone</span>
