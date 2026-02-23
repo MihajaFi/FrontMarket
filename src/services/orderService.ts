@@ -13,14 +13,15 @@ export interface OrderItemResponse {
 // Interface pour la réponse backend, qui inclut l'ID généré
 export interface OrderResponse {
   id: number;
-    order_date: string;
-    total_amount: number;
-    status: "PENDING" | "PAID" | "SHIPPED" | "CANCELLED";
-    user_name: string;
-    address: string;
-    phone: string;
-    payment_method: "MVOLA" | "ORANGEMONEY" | "AIRTELMONEY";
-    items: OrderItemResponse[];
+  orderDate: string;
+  totalAmount: number;
+  status: "PENDING" | "PAID" | "SHIPPED" | "CANCELLED";
+  userName: string;
+  merchantName: string;
+  address: string;
+  phone: string;
+  paymentMethod: "MVOLA" | "ORANGEMONEY" | "AIRTELMONEY";
+  items: OrderItemResponse[];
 }
 
 

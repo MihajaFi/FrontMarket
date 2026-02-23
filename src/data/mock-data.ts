@@ -6,10 +6,13 @@ export interface Product {
   price?: number;
   stock?: number;
   image: string;
+  merchant: string
 }
 export interface ProductRequest {
   name: string;
   description: string;
+  merchantId: string;
+  category: string;
   price: number;
   image?: File;
 }
@@ -29,26 +32,77 @@ export interface Order {
   items: OrderItem[];
 }
 
-export interface OrderItemResponse {
-  id: number;
-  quantity: number;
-  unit_price: number;
-  sub_total: number;
-  product_name: string;
-  product_description: string;
-  product_price: number;
+export interface PromotionLoyalty {
+  id : number;
+  promotion_type : string;
+  value : number;
+  start_date : string;
+  end_date : string;
+  condition : string;
 }
 
-export interface OrderResponse {
+export interface PromotionLoyaltyRequest {
+  promotion_type : string;
+  value : number;
+  start_date : string;
+  end_date : string; 
+  condition : string;
+}
+
+
+
+export interface Promotion {
+  id : number;
+  promotionLoyalty : PromotionLoyalty;
+  productItems : Product[];
+  type: 'percentage' | 'fixed';
+  status: 'active' | 'expirée' | 'planifiée';
+}
+export interface ProductItemRequest {
+  productId: string;
+}
+
+export interface PromotionRequest {
+  promotionLoyalty: number;
+  productItems: ProductItemRequest[];
+  type: 'percentage' | 'fixed';
+  status: 'active' | 'expirée' | 'planifiée';
+}
+
+export type Merchant = {
   id: number;
-  order_date: string;
-  total_amount: number;
-  status: "PENDING" | "PAID" | "SHIPPED" | "CANCELLED";
-  user_name: string;
-  address: string;
+  name: string;
+  email: string;
   phone: string;
-  payment_method: "MVOLA" | "ORANGEMONEY" | "AIRTELMONEY";
-  items: OrderItemResponse[];
+  city: string;
+  category: string;
+  status: 'actif' | 'inactif';
+  joinDate: string;
+  totalSales: number;
+  avatarColor: string;
+};
+export type MerchantCreate = {
+  name: string;
+  email: string;
+  phone: string;
+  city: string;
+  category: string;
+  status: "actif" | "inactif";
+};
+
+export interface StockResponse {
+  id: number;
+  quantity: number;
+  alert: string;
+  productName: string;
+  description: string;
+  price: number;
+}
+
+export interface StockRequest {
+  quantity: number;
+  alert: string;
+  productId: number;
 }
 
 export const formatPrice = (price: number): string => {

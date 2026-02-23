@@ -90,7 +90,7 @@ const Orders = () => {
                     </p>
 
                     <p className="text-xs text-muted-foreground">
-                      {new Date(order.order_date).toLocaleDateString("fr-FR")}
+                      {new Date(order.orderDate).toLocaleDateString("fr-FR")}
                     </p>
                   </div>
 
@@ -114,7 +114,7 @@ const Orders = () => {
 
                 <div className="flex justify-between pt-3 border-t font-bold text-primary">
                   <span>Total</span>
-                  <span>{formatPrice(order.total_amount)}</span>
+                  <span>{formatPrice(order.totalAmount)}</span>
                 </div>
 
                 {order.status === "PENDING" && (
