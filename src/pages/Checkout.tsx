@@ -278,5 +278,4 @@ if (!isAuthenticated && !isLoading) {
     </MarketplaceLayout>
   );
 };
-
 export default Checkout;

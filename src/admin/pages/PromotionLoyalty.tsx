@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { promotionLoyaltyService } from '@/services';
+import { Layout } from '@/components/Layout';
 import type { PromotionLoyalty, PromotionLoyaltyRequest } from '@/data/mock-data';
 
 // Modal pour créer / éditer une promotion
@@ -116,8 +117,7 @@ function PromotionModal({
   );
 }
 
-// Page principale pour afficher les promotions
-export default function PromotionLoyaltyPage() {
+export function PromotionLoyalty() {
   const [promotions, setPromotions] = useState<PromotionLoyalty[]>([]);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -155,6 +155,7 @@ export default function PromotionLoyaltyPage() {
   );
 
   return (
+    <Layout title="PromotionLoyalty" subtitle={`${promotions.length} promotion(s) enregistrée(s)`}>
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Promotions de fidélité</h1>
 
@@ -234,5 +235,6 @@ export default function PromotionLoyaltyPage() {
         initialData={editing || undefined}
       />
     </div>
+    </Layout>
   );
 }

@@ -209,5 +209,4 @@ const ProductDetail = () => {
     </MarketplaceLayout>
   );
 };
-
 export default ProductDetail;

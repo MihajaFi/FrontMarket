@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import { salesByMonth, salesByMerchant, stockByCategory, merchants, products, orders } from '@/data/mockData';
 import { TrendingUp, Package, Store, ShoppingCart, AlertTriangle } from 'lucide-react';
-
+  
 const COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4'];
 
 const totalSales = salesByMonth.reduce((s, m) => s + m.ventes, 0);

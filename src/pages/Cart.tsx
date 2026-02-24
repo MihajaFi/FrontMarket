@@ -98,5 +98,4 @@ const Cart = () => {
     </MarketplaceLayout>
   );
 };
-
 export default Cart;

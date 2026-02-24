@@ -94,5 +94,4 @@ const Register = () => {
     </MarketplaceLayout>
   );
 };
-
 export default Register;

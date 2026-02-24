@@ -6,21 +6,21 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { label: 'Tableau de bord', icon: LayoutDashboard, path: '/' },
+  { label: 'Tableau de bord', icon: LayoutDashboard, path: '/admin/dashboard' },
   {
     section: 'GESTION',
     items: [
-      { label: 'Commerçants', icon: Store, path: '/merchants' },
-      { label: 'Catégories', icon: Tag, path: '/categories' },
-      { label: 'Produits', icon: Package, path: '/products' },
+      { label: 'Commerçants', icon: Store, path: '/admin/merchants' },
+      { label: 'Catégories', icon: Tag, path: '/admin/promotion-loyalty' },
+      { label: 'Produits', icon: Package, path: '/admin/products' },
     ],
   },
   {
     section: 'OPÉRATIONS',
     items: [
-      { label: 'Commandes', icon: ShoppingCart, path: '/orders' },
-      { label: 'Stocks', icon: BarChart2, path: '/stock' },
-      { label: 'Promotions', icon: Gift, path: '/promotions' },
+      { label: 'Commandes', icon: ShoppingCart, path: '/admin/orders' },
+      { label: 'Stocks', icon: BarChart2, path: '/admin/stock' },
+      { label: 'Promotions', icon: Gift, path: '/admin/promotions' },
     ],
   },
 ];

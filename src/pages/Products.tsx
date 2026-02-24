@@ -137,5 +137,4 @@ const Products = () => {
     </MarketplaceLayout>
   );
 };
-
 export default Products;

@@ -136,5 +136,4 @@ const Orders = () => {
     </MarketplaceLayout>
   );
 };
-
 export default Orders;
