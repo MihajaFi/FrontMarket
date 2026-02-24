@@ -122,7 +122,7 @@ export function AdminProducts() {
             ) : filtered.map(p => (
               <tr key={p.id}>
                 <td>
-                  {p.image ? <img src={p.image} alt={p.name} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 8 }} /> :
+                  {p.image ? <img src={`${import.meta.env.VITE_IMAGE}${p.image}`} alt={p.name} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 8 }} /> :
                     <Package size={28} color="hsl(var(--muted-foreground))" />}
                 </td>
                 <td>{p.name}</td>
