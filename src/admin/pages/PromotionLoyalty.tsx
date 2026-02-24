@@ -21,7 +21,7 @@ function PromotionModal({
       value: 0,
       start_date: '',
       end_date: '',
-      condition: ''
+      conditions: ''
     }
   );
 
@@ -33,13 +33,25 @@ function PromotionModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(form);
+
+    // Préparer les dates au format ISO que Symfony comprend
+    const payload: PromotionLoyaltyRequest = {
+      promotion_type: form.promotion_type,
+      value: form.value,
+      start_date: form.start_date ,
+      end_date: form.end_date,
+      conditions: form.conditions
+    };
+
+    onSave(payload);
+
+    // Reset form
     setForm({
       promotion_type: '',
-      value: 0,
+      value: 12,
       start_date: '',
       end_date: '',
-      condition: ''
+      conditions: ''
     });
   };
 
@@ -95,11 +107,12 @@ function PromotionModal({
             />
           </div>
           <div>
-            <label className="block font-medium">Condition</label>
+            <label className="block font-medium">Conditions</label>
             <input
               type="text"
-              value={form.condition}
-              onChange={e => setForm(f => ({ ...f, condition: e.target.value }))}
+              value={form.conditions}
+              onChange={e => setForm(f => ({ ...f, conditions: e.target.value }))}
+              required
               className="border p-2 rounded w-full"
             />
           </div>
@@ -124,7 +137,12 @@ export function PromotionLoyalty() {
   const [editing, setEditing] = useState<PromotionLoyalty | null>(null);
 
   useEffect(() => {
-    fetchPromotions();
+    const token = localStorage.getItem("mc_token");
+    if (!token) {
+      window.location.href = "/login";
+    } else {
+      fetchPromotions();
+    }
   }, []);
 
   const fetchPromotions = async () => {
@@ -156,85 +174,85 @@ export function PromotionLoyalty() {
 
   return (
     <Layout title="PromotionLoyalty" subtitle={`${promotions.length} promotion(s) enregistrée(s)`}>
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Promotions de fidélité</h1>
+      <div className="p-6 max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Promotions de fidélité</h1>
 
-      <div className="flex justify-between mb-4">
-        <input
-          type="text"
-          placeholder="Rechercher par type"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="border p-2 rounded w-1/2"
+        <div className="flex justify-between mb-4">
+          <input
+            type="text"
+            placeholder="Rechercher par type"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="border p-2 rounded w-1/2"
+          />
+          <button
+            className="bg-green-500 text-white px-4 py-2 rounded"
+            onClick={() => {
+              setEditing(null);
+              setModalOpen(true);
+            }}
+          >
+            Ajouter
+          </button>
+        </div>
+
+        <table className="w-full border-collapse border">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border p-2">ID</th>
+              <th className="border p-2">Type</th>
+              <th className="border p-2">Valeur</th>
+              <th className="border p-2">Début</th>
+              <th className="border p-2">Fin</th>
+              <th className="border p-2">Conditions</th>
+              <th className="border p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredPromotions.length === 0 && (
+              <tr>
+                <td colSpan={7} className="text-center p-4">
+                  Aucune promotion
+                </td>
+              </tr>
+            )}
+            {filteredPromotions.map(p => (
+              <tr key={p.id}>
+                <td className="border p-2">{p.id}</td>
+                <td className="border p-2">{p.promotion_type}</td>
+                <td className="border p-2">{p.value}</td>
+                <td className="border p-2">{p.start_date}</td>
+                <td className="border p-2">{p.end_date}</td>
+                <td className="border p-2">{p.conditions}</td>
+                <td className="border p-2 space-x-2">
+                  <button
+                    className="bg-yellow-400 text-white px-2 py-1 rounded"
+                    onClick={() => {
+                      setEditing(p);
+                      setModalOpen(true);
+                    }}
+                  >
+                    Modifier
+                  </button>
+                  <button
+                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    onClick={() => handleDelete(p.id)}
+                  >
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <PromotionModal
+          isOpen={modalOpen}
+          closeModal={() => setModalOpen(false)}
+          onSave={handleSave}
+          initialData={editing || undefined}
         />
-        <button
-          className="bg-green-500 text-white px-4 py-2 rounded"
-          onClick={() => {
-            setEditing(null);
-            setModalOpen(true);
-          }}
-        >
-          Ajouter
-        </button>
       </div>
-
-      <table className="w-full border-collapse border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border p-2">ID</th>
-            <th className="border p-2">Type</th>
-            <th className="border p-2">Valeur</th>
-            <th className="border p-2">Début</th>
-            <th className="border p-2">Fin</th>
-            <th className="border p-2">Condition</th>
-            <th className="border p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredPromotions.length === 0 && (
-            <tr>
-              <td colSpan={7} className="text-center p-4">
-                Aucune promotion
-              </td>
-            </tr>
-          )}
-          {filteredPromotions.map(p => (
-            <tr key={p.id}>
-              <td className="border p-2">{p.id}</td>
-              <td className="border p-2">{p.promotion_type}</td>
-              <td className="border p-2">{p.value}</td>
-              <td className="border p-2">{p.start_date}</td>
-              <td className="border p-2">{p.end_date}</td>
-              <td className="border p-2">{p.condition}</td>
-              <td className="border p-2 space-x-2">
-                <button
-                  className="bg-yellow-400 text-white px-2 py-1 rounded"
-                  onClick={() => {
-                    setEditing(p);
-                    setModalOpen(true);
-                  }}
-                >
-                  Modifier
-                </button>
-                <button
-                  className="bg-red-500 text-white px-2 py-1 rounded"
-                  onClick={() => handleDelete(p.id)}
-                >
-                  Supprimer
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <PromotionModal
-        isOpen={modalOpen}
-        closeModal={() => setModalOpen(false)}
-        onSave={handleSave}
-        initialData={editing || undefined}
-      />
-    </div>
     </Layout>
   );
 }

@@ -23,7 +23,7 @@ export function AdminPromotions() {
   });
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
- 
+
   useEffect(() => {
     fetchPromotions();
     fetchPromotionLoyalties();
@@ -34,10 +34,12 @@ export function AdminPromotions() {
     const data = await promotionService.getAll();
     setList(data);
   }
+
   async function fetchProducts() {
     const data = await productService.getProducts();
     setProducts(data);
   }
+
   async function fetchPromotionLoyalties() {
     const data = await promotionLoyaltyService.getAll();
     setPromotionLoyalties(data);
@@ -50,18 +52,19 @@ export function AdminPromotions() {
   }
 
   function openEdit(p: Promotion) {
-    setEditing(p);
-    setForm({
-      promotionLoyalty: p.promotionLoyalty.id,
-      productItems: p.productItems.map(pid => ({ productId: pid.id.toString() })),
-      type: p.type,
-      status: p.status,
-    });
-    setModalOpen(true);
-  }
+  setEditing(p);
+  setForm({
+    promotionLoyalty: p.promotionLoyalty.id,
+    productItems: p.productItems.map(pid => ({ productId: Number(pid.id) })), // <-- conversion en number
+    type: p.type,
+    status: p.status,
+  });
+  setModalOpen(true);
+ }
 
   async function handleSave() {
     if (!form.promotionLoyalty || form.productItems.length === 0) return;
+
     let saved: Promotion;
     if (editing) {
       saved = await promotionService.update(editing.id, form);
@@ -81,10 +84,10 @@ export function AdminPromotions() {
 
   function toggleProduct(productId: number) {
     setForm(f => {
-      const exists = f.productItems.find(p => p.productId === productId.toString());
+      const exists = f.productItems.find(p => p.productId === productId);
       const updatedItems = exists
-        ? f.productItems.filter(p => p.productId !== productId.toString())
-        : [...f.productItems, { productId: productId.toString() }];
+        ? f.productItems.filter(p => p.productId !== productId)
+        : [...f.productItems, { productId }];
       return { ...f, productItems: updatedItems };
     });
   }
@@ -213,10 +216,10 @@ export function AdminPromotions() {
                         fontWeight: 600,
                         border: 'none',
                         cursor: 'pointer',
-                        background: form.productItems.some(pi => pi.productId === p.id.toString())
+                        background: form.productItems.some(pi => pi.productId === Number (p.id))
                           ? 'hsl(var(--primary))'
                           : 'hsl(var(--muted))',
-                        color: form.productItems.some(pi => pi.productId === p.id.toString())
+                        color: form.productItems.some(pi => pi.productId === Number (p.id))
                           ? 'white'
                           : 'hsl(var(--muted-foreground))',
                         transition: 'all 0.15s',

@@ -38,7 +38,7 @@ export interface PromotionLoyalty {
   value : number;
   start_date : string;
   end_date : string;
-  condition : string;
+  conditions : string;
 }
 
 export interface PromotionLoyaltyRequest {
@@ -46,7 +46,7 @@ export interface PromotionLoyaltyRequest {
   value : number;
   start_date : string;
   end_date : string; 
-  condition : string;
+  conditions : string;
 }
 
 
@@ -59,7 +59,7 @@ export interface Promotion {
   status: 'active' | 'expirée' | 'planifiée';
 }
 export interface ProductItemRequest {
-  productId: string;
+  productId: number;
 }
 
 export interface PromotionRequest {
