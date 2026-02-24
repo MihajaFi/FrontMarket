@@ -1,4 +1,4 @@
-import { Toaster } from "@/components/ui/toaster"; 
+import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,8 +15,9 @@ import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import Loyalty from "./pages/Loyalty";
 import NotFound from "./pages/NotFound";
-import  AdminDashboard from "./admin/dashboard/AdminDashboard";
+import AdminDashboard from "./admin/dashboard/AdminDashboard";
 import { AdminMerchants, AdminProducts, AdminOrders, AdminPromotions, AdminStock, PromotionLoyalty } from "./admin/pages";
+import AdminRoute from "./routes/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -41,13 +42,15 @@ const App = () => (
               <Route path="/loyalty" element={<Loyalty />} />
 
               {/* Admin routes */}
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/merchants" element={<AdminMerchants />} />
-              <Route path="/admin/products" element={<AdminProducts />} />
-              <Route path="/admin/orders" element={<AdminOrders />} />
-              <Route path="/admin/promotions" element={<AdminPromotions />} />
-              <Route path="/admin/stock" element={<AdminStock />} />
-              <Route path="/admin/promotion-loyalty" element={<PromotionLoyalty />} />
+              <Route path="/admin/dashboard" element={<AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>} />
+              <Route path="/admin/merchants" element={<AdminRoute><AdminMerchants /></AdminRoute>} />
+              <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
+              <Route path="/admin/orders" element={<AdminRoute><AdminOrders /></AdminRoute>} />
+              <Route path="/admin/promotions" element={<AdminRoute><AdminPromotions /></AdminRoute>} />
+              <Route path="/admin/stock" element={<AdminRoute><AdminStock /></AdminRoute>} />
+              <Route path="/admin/promotion-loyalty" element={<AdminRoute><PromotionLoyalty /></AdminRoute>} />
 
               {/* Fallback */}
               <Route path="*" element={<NotFound />} />
