@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Layout } from '@/components/Layout';
-import { Product, ProductRequest } from '@/data/mock-data';
-import { Plus, Pencil, Trash2, Search, Package, Upload, X } from 'lucide-react';
-import { merchantProductService, formatPrice } from '@/services/merchantProductService';
+import { Product, ProductRequest, Merchant } from '@/data/mock-data';
+import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
+import { merchantProductService } from '@/services/merchantProductService';
+import { merchantService } from '@/services/adminMerchantService';
+import { formatPrice } from '@/services/merchantProductService';
 
 export function AdminProducts() {
   const [list, setList] = useState<Product[]>([]);
+  const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
@@ -13,17 +16,18 @@ export function AdminProducts() {
     name: '',
     description: '',
     category: '',
-    merchantId: '',
+    merchantId: 0,
     price: 0,
     image: undefined
   });
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Charger les produits depuis le backend
+  // --- Chargement produits et marchands ---
   useEffect(() => {
     fetchProducts();
+    fetchMerchants();
   }, []);
 
   const fetchProducts = async () => {
@@ -31,26 +35,45 @@ export function AdminProducts() {
       const data = await merchantProductService.getProducts();
       setList(data);
     } catch (error) {
-      console.error(error);
+      console.error("Erreur chargement produits :", error);
+    }
+  };
+
+  const fetchMerchants = async () => {
+    try {
+      const data = await merchantService.getAll();
+      setMerchants(data);
+    } catch (error) {
+      console.error("Erreur chargement marchands :", error);
     }
   };
 
   const filtered = list.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
 
+  // --- Modal ouverture ajout ---
   function openAdd() {
     setEditing(null);
-    setForm({ name: '', description: '', category: '', merchantId: '', price: 0, image: undefined });
+    setForm({
+      name: '',
+      description: '',
+      category: '',
+      merchantId: merchants[0]?.id || 0,
+      price: 0,
+      image: undefined
+    });
     setImagePreview('');
     setModalOpen(true);
   }
 
+  // --- Modal ouverture édition ---
   function openEdit(p: Product) {
+    const merchant = merchants.find(m => m.name === p.merchant);
     setEditing(p);
     setForm({
       name: p.name,
       description: p.description,
       category: p.category,
-      merchantId: p.merchant,
+      merchantId: merchant ? merchant.id : 0,
       price: p.price || 0,
       image: undefined
     });
@@ -58,6 +81,7 @@ export function AdminProducts() {
     setModalOpen(true);
   }
 
+  // --- Gestion image ---
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -67,35 +91,46 @@ export function AdminProducts() {
     reader.readAsDataURL(file);
   };
 
+  // --- Enregistrement produit ---
   const handleSave = async () => {
+    if (!form.name || !form.category || !form.merchantId || !form.price) {
+      alert("Tous les champs obligatoires doivent être remplis !");
+      return;
+    }
+
     try {
       if (editing) {
-        await merchantProductService.updateProduct(editing.id, form);
+        await merchantProductService.updateProduct(Number(editing.id), form);
       } else {
         await merchantProductService.createProduct(form);
       }
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement :", error);
+      alert("Une erreur est survenue lors de l'enregistrement !");
+    } finally {
+      // Toujours fermer le modal et rafraîchir la liste
       setModalOpen(false);
       fetchProducts();
-    } catch (error) {
-      console.error(error);
-      alert('Erreur lors de l\'enregistrement du produit');
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Voulez-vous vraiment supprimer ce produit ?')) return;
+  // --- Suppression produit ---
+  const handleDelete = async (id: number) => {
+    if (!confirm("Voulez-vous vraiment supprimer ce produit ?")) return;
+
     try {
-      await merchantProductService.deleteProduct(id);
+      await merchantProductService.deleteProduct(id); // id déjà number
       fetchProducts();
       setDeleteId(null);
-    } catch (error) {
-      console.error(error);
-      alert('Erreur lors de la suppression du produit');
+    } catch (error: any) {
+      console.error("Échec suppression produit id", id, error.response?.data || error);
+      alert("Erreur lors de la suppression du produit : " + (error.response?.data?.message || error.message));
     }
   };
 
   return (
     <Layout title="Produits" subtitle={`${list.length} produit(s)`}>
+      {/* --- Barre recherche et ajout --- */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div className="search-bar">
           <Search size={15} color="hsl(var(--muted-foreground))" />
@@ -104,6 +139,7 @@ export function AdminProducts() {
         <button className="btn-primary" onClick={openAdd}><Plus size={16} /> Ajouter un produit</button>
       </div>
 
+      {/* --- Tableau produits --- */}
       <div className="data-table">
         <table>
           <thead>
@@ -131,7 +167,7 @@ export function AdminProducts() {
                 <td>{p.price ? formatPrice(p.price) : '-'}</td>
                 <td style={{ display: 'flex', gap: 6 }}>
                   <button className="btn-icon btn-icon-edit" onClick={() => openEdit(p)}><Pencil size={13} /></button>
-                  <button className="btn-icon btn-icon-delete" onClick={() => setDeleteId(p.id)}><Trash2 size={13} /></button>
+                  <button className="btn-icon btn-icon-delete" onClick={() => setDeleteId(Number(p.id))}><Trash2 size={13} /></button>
                 </td>
               </tr>
             ))}
@@ -139,6 +175,7 @@ export function AdminProducts() {
         </table>
       </div>
 
+      {/* --- Modal ajout / édition --- */}
       {modalOpen && (
         <div className="modal-overlay" onClick={() => setModalOpen(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
@@ -148,12 +185,16 @@ export function AdminProducts() {
               <input className="form-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
               <label>Description</label>
               <input className="form-input" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
-              <label>Prix</label>
+              <label>Prix *</label>
               <input type="number" className="form-input" value={form.price} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} />
-              <label>Catégorie</label>
+              <label>Catégorie *</label>
               <input className="form-input" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} />
-              <label>Commerçant</label>
-              <input className="form-input" value={form.merchantId} onChange={e => setForm(f => ({ ...f, merchantId: e.target.value }))} />
+              <label>Commerçant *</label>
+              <select className="form-input" value={form.merchantId} onChange={e => setForm(f => ({ ...f, merchantId: Number(e.target.value) }))}>
+                {merchants.map(m => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
               <label>Image</label>
               <input type="file" ref={fileInputRef} onChange={handleFileChange} />
               {imagePreview && <img src={imagePreview} alt="preview" style={{ width: 80, height: 80, objectFit: 'cover', marginTop: 4 }} />}
@@ -166,13 +207,14 @@ export function AdminProducts() {
         </div>
       )}
 
-      {deleteId && (
+      {/* --- Modal suppression --- */}
+      {deleteId !== null && (
         <div className="modal-overlay" onClick={() => setDeleteId(null)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>
             <h3>Supprimer ce produit ?</h3>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6, marginTop: 12 }}>
               <button className="btn-ghost" onClick={() => setDeleteId(null)}>Annuler</button>
-              <button className="btn-danger" onClick={() => deleteId && handleDelete(deleteId)}>Supprimer</button>
+              <button className="btn-danger" onClick={() => handleDelete(deleteId)}>Supprimer</button>
             </div>
           </div>
         </div>

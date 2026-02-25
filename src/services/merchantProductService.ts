@@ -30,37 +30,42 @@ export const merchantProductService = {
 
   // POST /api/products
   async createProduct(productRequest: ProductRequest): Promise<Product> {
-    const formData = new FormData();
-    formData.append("name", productRequest.name);
-    formData.append("description", productRequest.description);
-    formData.append("merchantId", productRequest.merchantId);
-    formData.append("category", productRequest.category);
-    formData.append("price", productRequest.price.toString());
+  const formData = new FormData();
+  formData.append("name", productRequest.name);
+  formData.append("description", productRequest.description);
+  formData.append("merchantId", productRequest.merchantId.toString());
+  formData.append("category", productRequest.category);
+  formData.append("price", productRequest.price.toString());
 
-    if (productRequest.image) {
-      formData.append("image", productRequest.image);
-    }
+  if (productRequest.image) {
+    formData.append("image", productRequest.image);
+  }
 
-    try {
-      const { data } = await axiosClient.post("/products", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      return data;
-    } catch (error) {
-      console.error("Failed to create product:", error);
-      throw new Error("Invalid product data");
-    }
-  },
+  try {
+    const token = localStorage.getItem('mc_token'); // ← récupère ton JWT
+    const { data } = await axiosClient.post("/products", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      withCredentials: true, // nécessaire si allow_credentials = true
+    });
+    return data;
+  } catch (error) {
+    console.error("Failed to create product:", error);
+    throw new Error("Invalid product data");
+  }
+},
 
   // PUT /api/products/:id
   async updateProduct(
-    id: string,
+    id: number,
     productRequest: ProductRequest
   ): Promise<Product> {
     const formData = new FormData();
     formData.append("name", productRequest.name);
     formData.append("description", productRequest.description);
-    formData.append("merchantId", productRequest.merchantId);
+    formData.append("merchantId", productRequest.merchantId.toString());
     formData.append("category", productRequest.category);
     formData.append("price", productRequest.price.toString());
 
@@ -80,7 +85,7 @@ export const merchantProductService = {
   },
 
   // DELETE /api/products/:id
-  async deleteProduct(id: string): Promise<void> {
+  async deleteProduct(id: number): Promise<void> {
     try {
       await axiosClient.delete(`/products/${id}`);
     } catch (error) {

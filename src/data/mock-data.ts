@@ -11,7 +11,7 @@ export interface Product {
 export interface ProductRequest {
   name: string;
   description: string;
-  merchantId: string;
+  merchantId: number;
   category: string;
   price: number;
   image?: File;

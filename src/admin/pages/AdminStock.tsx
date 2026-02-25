@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Layout } from '@/components/Layout';
 import { stockService } from '@/services/stockService';
-import type { StockResponse, StockRequest } from '@/data/mock-data';
+import { merchantProductService } from '@/services/merchantProductService';
+import type { StockResponse, StockRequest, Product } from '@/data/mock-data';
 import { AlertTriangle, TrendingDown, CheckCircle, Pencil, Plus, Trash2, Search } from 'lucide-react';
 
 export function AdminStock() {
   const [list, setList] = useState<StockResponse[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -25,7 +27,18 @@ export function AdminStock() {
       }
       setLoading(false);
     }
+
+    async function fetchProducts() {
+      try {
+        const data = await merchantProductService.getProducts();
+        setProducts(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     fetchStocks();
+    fetchProducts();
   }, []);
 
   // --- Filtered list ---
@@ -41,14 +54,23 @@ export function AdminStock() {
 
   // --- Handlers ---
   function openAdd() {
-    setEditing(null);
-    setForm({ quantity: 0, alert: '', productId: 0 });
-    setModalOpen(true);
-  }
+  setEditing(null);
+  setForm({ 
+    quantity: 0, 
+    alert: '', 
+    productId: Number(products[0]?.id) || 0 // Force type number
+  });
+  setModalOpen(true);
+}
 
   function openEdit(stock: StockResponse) {
     setEditing(stock);
-    setForm({ quantity: stock.quantity, alert: stock.alert, productId: stock.id });
+    const product = products.find(p => p.name === stock.productName);
+    setForm({
+      quantity: stock.quantity,
+      alert: stock.alert,
+      productId: Number(product?.id) || 0,
+    });
     setModalOpen(true);
   }
 
@@ -79,41 +101,22 @@ export function AdminStock() {
     }
   }
 
-  // --- Stock percentage for progress bar ---
-  const stockPct = (s: StockResponse) => Math.min(100, Math.round((s.quantity / Math.max(10, s.quantity + 1)) * 100));
-
   return (
     <Layout title="Gestion des stocks" subtitle="Suivi des niveaux de stock">
+      {/* Recherche + Ajouter */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <div className="search-bar">
-            <Search size={15} color="hsl(var(--muted-foreground))" />
-            <input placeholder="Recherche produit..." value={search} onChange={e => setSearch(e.target.value)} />
-          </div>
+        <div className="search-bar">
+          <Search size={15} color="hsl(var(--muted-foreground))" />
+          <input placeholder="Recherche produit..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
         <button className="btn-primary" onClick={openAdd}><Plus size={16} /> Ajouter un stock</button>
       </div>
 
       {/* Summary cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-        <div className="stat-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div className="stat-icon" style={{ background: 'hsl(var(--stat-sales) / 0.12)' }}><CheckCircle size={20} color="hsl(var(--stat-sales))" /></div>
-            <div><div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{okCount}</div><div style={{ fontSize: '0.8rem', color: 'hsl(var(--muted-foreground))' }}>Disponibles</div></div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div className="stat-icon" style={{ background: 'hsl(var(--stat-stock) / 0.12)' }}><TrendingDown size={20} color="hsl(var(--stat-stock))" /></div>
-            <div><div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{lowCount}</div><div style={{ fontSize: '0.8rem', color: 'hsl(var(--muted-foreground))' }}>Stock faible</div></div>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div className="stat-icon" style={{ background: 'hsl(var(--destructive) / 0.1)' }}><AlertTriangle size={20} color="hsl(var(--destructive))" /></div>
-            <div><div style={{ fontSize: '1.5rem', fontWeight: 800 }}>{ruptureCount}</div><div style={{ fontSize: '0.8rem', color: 'hsl(var(--muted-foreground))' }}>Ruptures</div></div>
-          </div>
-        </div>
+        <div className="stat-card"><CheckCircle size={20} color="green" /> <span>{okCount} Disponibles</span></div>
+        <div className="stat-card"><TrendingDown size={20} color="orange" /> <span>{lowCount} Stock faible</span></div>
+        <div className="stat-card"><AlertTriangle size={20} color="red" /> <span>{ruptureCount} Ruptures</span></div>
       </div>
 
       {/* Data table */}
@@ -130,9 +133,7 @@ export function AdminStock() {
             </tr>
           </thead>
           <tbody>
-            {loading ? (
-              <tr><td colSpan={6} style={{ textAlign: 'center' }}>Chargement...</td></tr>
-            ) : filtered.length === 0 ? (
+            {filtered.length === 0 ? (
               <tr><td colSpan={6} style={{ textAlign: 'center' }}>Aucun stock trouvé</td></tr>
             ) : filtered.map(s => (
               <tr key={s.id}>
@@ -151,12 +152,23 @@ export function AdminStock() {
         </table>
       </div>
 
-      {/* Modal for create / edit */}
+      {/* Modal */}
       {modalOpen && (
         <div className="modal-overlay" onClick={() => setModalOpen(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 400 }}>
-            <h3 style={{ fontWeight: 700, marginBottom: '1rem' }}>{editing ? 'Modifier le stock' : 'Ajouter un stock'}</h3>
+            <h3>{editing ? 'Modifier le stock' : 'Ajouter un stock'}</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {/* Select produit */}
+              <select
+                value={form.productId}
+                onChange={e => setForm(f => ({ ...f, productId: Number(e.target.value) }))}
+                className="form-input"
+              >
+                {products.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+
               <input
                 type="number"
                 placeholder="Quantité"
@@ -169,13 +181,6 @@ export function AdminStock() {
                 placeholder="Alerte (disponible/faible/rupture)"
                 value={form.alert}
                 onChange={e => setForm(f => ({ ...f, alert: e.target.value }))}
-                className="form-input"
-              />
-              <input
-                type="number"
-                placeholder="ID du produit"
-                value={form.productId}
-                onChange={e => setForm(f => ({ ...f, productId: Number(e.target.value) }))}
                 className="form-input"
               />
             </div>
@@ -191,7 +196,7 @@ export function AdminStock() {
       {deleteId !== null && (
         <div className="modal-overlay" onClick={() => setDeleteId(null)}>
           <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 320 }}>
-            <h3 style={{ fontWeight: 700, marginBottom: '0.5rem' }}>Supprimer le stock ?</h3>
+            <h3>Supprimer le stock ?</h3>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
               <button className="btn-ghost" onClick={() => setDeleteId(null)}>Annuler</button>
               <button className="btn-danger" onClick={() => handleDelete(deleteId!)}>Supprimer</button>
