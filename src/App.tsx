@@ -12,7 +12,7 @@ import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Checkout from "./pages/Checkout";
-import Orders from "./pages/Orders";
+import OrderTracking from "./pages/OrderTracking";
 import Loyalty from "./pages/Loyalty";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./admin/dashboard/AdminDashboard";
@@ -38,7 +38,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="/orders" element={<Orders />} />
+              <Route path="/orders" element={<OrderTracking/>} />
               <Route path="/loyalty" element={<Loyalty />} />
 
               {/* Admin routes */}

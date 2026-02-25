@@ -51,6 +51,31 @@ export const orderService = {
       items: o.items,
     }));
   },
+  getMyOrders: async (): Promise<OrderResponse[]> => {
+    const response = await axiosClient.get("/orders/me", {
+      withCredentials: true, // nécessaire si tu relies à la session Symfony
+    });
+    return response.data.map((o: any) => ({
+      id: o.id,
+      orderDate: o.orderDate ?? o.order_date,
+      totalAmount: o.totalAmount ?? o.total_amount,
+      status: o.status,
+      userName: o.userName ?? o.user_name,
+      merchantName: o.merchantName ?? o.merchant_name ?? "",
+      address: o.address,
+      phone: o.phone,
+      paymentMethod: o.paymentMethod ?? o.payment_method,
+      items: o.items.map((i: any) => ({
+        id: i.id,
+        quantity: i.quantity,
+        unit_price: i.unit_price ?? i.product_price,
+        sub_total: i.sub_total ?? i.quantity * i.unit_price,
+        product_name: i.product_name ?? i.productName,
+        product_description: i.product_description ?? i.productDescription,
+        product_price: i.product_price ?? i.unit_price,
+      })),
+    }));
+  },
 
   // GET BY ID
   getById: async (id: number): Promise<OrderResponse> => {
