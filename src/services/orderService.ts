@@ -79,7 +79,10 @@ export const orderService = {
     const response = await axiosClient.put(`/orders/${id}`, order);
     return response.data as OrderResponse;
   },
-
+  updateStatus: async (id: number, status: OrderResponse["status"]): Promise<OrderResponse> => {
+  const response = await axiosClient.patch(`/orders/${id}/status`, { status });
+  return response.data;
+  },
   // DELETE
   delete: async (id: number): Promise<{ message: string }> => {
     const response = await axiosClient.delete(`/orders/${id}`);

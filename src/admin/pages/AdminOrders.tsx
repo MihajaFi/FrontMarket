@@ -49,12 +49,23 @@ export function AdminOrders() {
   });
 
   /* =======================
-     STATUS UPDATE (UI ONLY)
+     STATUS UPDATE (BACKEND)
   ======================= */
-  function updateStatus(id: number, status: OrderResponse["status"]) {
-    setList(l => l.map(o => (o.id === id ? { ...o, status } : o)));
-    if (viewOrder?.id === id) {
-      setViewOrder(prev => (prev ? { ...prev, status } : null));
+  async function updateStatus(id: number, status: OrderResponse["status"]) {
+    try {
+      const currentOrder = list.find(o => o.id === id);
+      if (!currentOrder) return;
+
+      // Appel backend PATCH pour mise à jour partielle
+      const updated = await orderService.updateStatus(id, status);
+
+      // Met à jour le state local
+      setList(l => l.map(o => (o.id === id ? updated : o)));
+      if (viewOrder?.id === id) {
+        setViewOrder(updated);
+      }
+    } catch (error) {
+      console.error("Erreur update status:", error);
     }
   }
 
@@ -73,7 +84,7 @@ export function AdminOrders() {
         {STATUS_OPTIONS.map(s => (
           <div
             key={s}
-            className={statusConfig[s].cls}
+            className={statusConfig[s]?.cls || ""}
             style={{
               padding: "0.4rem 0.875rem",
               borderRadius: "99px",
@@ -84,7 +95,7 @@ export function AdminOrders() {
             }}
             onClick={() => setFilterStatus(filterStatus === s ? "all" : s)}
           >
-            {statusConfig[s].label} ({counts[s] || 0})
+            {statusConfig[s]?.label || s} ({counts[s] || 0})
           </div>
         ))}
       </div>
@@ -135,12 +146,16 @@ export function AdminOrders() {
                   <td><code>{o.id}</code></td>
                   <td>{o.userName}</td>
                   <td>{o.merchantName}</td>
-                  <td>{o.totalAmount.toLocaleString()} MAD</td>
+                  <td>{o.totalAmount?.toLocaleString() ?? "0"} MAD</td>
                   <td>{o.orderDate}</td>
                   <td>
-                    <span className={statusConfig[o.status].cls}>
-                      {statusConfig[o.status].label}
-                    </span>
+                    {statusConfig[o.status] ? (
+                      <span className={statusConfig[o.status].cls}>
+                        {statusConfig[o.status].label}
+                      </span>
+                    ) : (
+                      <span>Inconnu</span>
+                    )}
                   </td>
                   <td>
                     <div style={{ display: "flex", gap: "0.4rem" }}>
@@ -155,7 +170,7 @@ export function AdminOrders() {
                       >
                         {STATUS_OPTIONS.map(s => (
                           <option key={s} value={s}>
-                            {statusConfig[s].label}
+                            {statusConfig[s]?.label || s}
                           </option>
                         ))}
                       </select>
@@ -180,7 +195,7 @@ export function AdminOrders() {
             <Row label="Adresse" value={viewOrder.address} />
             <Row
               label="Total"
-              value={`${viewOrder.totalAmount.toLocaleString()} MAD`}
+              value={`${viewOrder.totalAmount?.toLocaleString() ?? "0"} MAD`}
               bold
             />
             <button onClick={() => setViewOrder(null)}>Fermer</button>
