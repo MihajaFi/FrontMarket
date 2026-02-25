@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { MapPin, CreditCard, CheckCircle2, ArrowLeft, ArrowRight, Phone, Loader2 } from "lucide-react";
-import { Order } from "@/data/mock-data";
+import type { OrderAndOrderItemRequest } from "@/data/mock-data";
 
 type Step = "address" | "summary" | "payment" | "confirmation";
 const VITE_IMAGE = import.meta.env.VITE_IMAGE || "";
@@ -27,30 +27,30 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [orderId, setOrderId] = useState<string>(""); // pour afficher la confirmation
 
-if (isLoading) {
-  // On peut afficher un loader ou rien du tout
-  return (
-    <MarketplaceLayout>
-      <div className="container py-16 text-center">
-        <Loader2 className="animate-spin mx-auto h-8 w-8 text-primary" />
-      </div>
-    </MarketplaceLayout>
-  );
-}
+  if (isLoading) {
+    // On peut afficher un loader ou rien du tout
+    return (
+      <MarketplaceLayout>
+        <div className="container py-16 text-center">
+          <Loader2 className="animate-spin mx-auto h-8 w-8 text-primary" />
+        </div>
+      </MarketplaceLayout>
+    );
+  }
 
-if (!isAuthenticated && !isLoading) {
-  return (
-    <MarketplaceLayout>
-      <div className="container py-16 text-center space-y-4">
-        <h2 className="font-display font-bold text-2xl text-foreground">Connexion requise</h2>
-        <p className="text-muted-foreground">Veuillez vous connecter pour passer commande.</p>
-        <Button onClick={() => navigate("/login")} className="marketplace-gradient text-primary-foreground border-0 font-semibold">
-          Se connecter
-        </Button>
-      </div>
-    </MarketplaceLayout>
-  );
-}
+  if (!isAuthenticated && !isLoading) {
+    return (
+      <MarketplaceLayout>
+        <div className="container py-16 text-center space-y-4">
+          <h2 className="font-display font-bold text-2xl text-foreground">Connexion requise</h2>
+          <p className="text-muted-foreground">Veuillez vous connecter pour passer commande.</p>
+          <Button onClick={() => navigate("/login")} className="marketplace-gradient text-primary-foreground border-0 font-semibold">
+            Se connecter
+          </Button>
+        </div>
+      </MarketplaceLayout>
+    );
+  }
 
   if (items.length === 0 && step !== "confirmation") {
     navigate("/cart");
@@ -58,36 +58,36 @@ if (!isAuthenticated && !isLoading) {
   }
 
   const handlePlaceOrder = async () => {
-  setLoading(true);
-  try {
-    // Préparer le payload pour orderService
-    const operator = momoProvider.toUpperCase() as "MVOLA" | "ORANGEMONEY" | "AIRTELMONEY";
-    const orderPayload: Order = {
-      status: "PENDING", // ou autre statut par défaut
-      userId: Number(user.id), // récupère l'id réel de l'utilisateur connecté si tu as le contexte
-      address: address,
-      phone: phone,
-      paymentMethod: operator,
-      items: items.map(({ product, quantity }) => ({
-        productId: Number(product.id),
-        quantity: quantity,
-        price: product.price,
-      })),
-    };
+    setLoading(true);
+    try {
+      // Préparer le payload pour orderService
+      const operator = momoProvider.toUpperCase() as "MVOLA" | "ORANGEMONEY" | "AIRTELMONEY";
+      const orderPayload: OrderAndOrderItemRequest = {
+        status: "PENDING",
+        userId: Number(user.id),
+        address,
+        phone,
+        paymentMethod: operator,
+        items: items.map(({ product, quantity }) => ({
+          productId: Number(product.id),
+          quantity,
+          unitPrice: product.price,
+        })),
+      };
 
-    const order = await orderService.create(orderPayload);
-    setOrderId(order.id.toString());
-    const token = localStorage.getItem("token"); // récupérer avant de clear
-    clearCart();
-    localStorage.setItem("token", token!); 
-    setStep("confirmation");
-    toast.success("Commande passée avec succès !");
-  } catch (err: any) {
-    toast.error(err.message || "Erreur lors de la commande");
-  } finally {
-    setLoading(false);
-  }
-};
+      const order = await orderService.create(orderPayload);
+      setOrderId(order.id.toString());
+      const token = localStorage.getItem("token"); // récupérer avant de clear
+      clearCart();
+      localStorage.setItem("token", token!);
+      setStep("confirmation");
+      toast.success("Commande passée avec succès !");
+    } catch (err: any) {
+      toast.error(err.message || "Erreur lors de la commande");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const steps: { key: Step; label: string; icon: React.ReactNode }[] = [
     { key: "address", label: "Adresse", icon: <MapPin className="h-4 w-4" /> },
@@ -105,9 +105,8 @@ if (!isAuthenticated && !isLoading) {
         <div className="flex items-center justify-between mb-8">
           {steps.map((s, i) => (
             <div key={s.key} className="flex items-center">
-              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                i <= stepIndex ? "bg-primary/10 text-primary" : "text-muted-foreground"
-              }`}>
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${i <= stepIndex ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                }`}>
                 {s.icon}
                 <span className="hidden sm:inline">{s.label}</span>
               </div>
@@ -211,11 +210,10 @@ if (!isAuthenticated && !isLoading) {
                       key={op.id}
                       type="button"
                       onClick={() => setMomoProvider(op.id)}
-                      className={`p-3 rounded-lg border-2 text-center text-sm font-medium transition-colors ${
-                        momoProvider === op.id
+                      className={`p-3 rounded-lg border-2 text-center text-sm font-medium transition-colors ${momoProvider === op.id
                           ? "border-primary bg-primary/5 text-primary"
                           : "border-border text-muted-foreground hover:border-primary/50"
-                      }`}
+                        }`}
                     >
                       <div className={`w-6 h-6 rounded-full ${op.color} mx-auto mb-1`} />
                       {op.label}

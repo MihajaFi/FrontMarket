@@ -1,20 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import MarketplaceLayout from "@/components/marketplace/MarketplaceLayout";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { LogIn, Eye, EyeOff } from "lucide-react";
+import MarketplaceLayout from "@/components/marketplace/MarketplaceLayout";
 
-const Login = () => {
+export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [role, setRole] = useState<"client" | "commercant" | "admin">("client");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,16 +27,13 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // 👇 récupération de l'utilisateur connecté
-      const user = await login(email, password);
-
+      const user = await login(email, password); // login réel depuis AuthContext
       toast.success("Connexion réussie !");
 
-      // 🔁 Redirection selon le rôle
       if (user.roles.includes("ROLE_ADMIN")) {
         navigate("/admin/dashboard");
       } else {
-        navigate("/");
+        navigate("/"); // client ou commercant
       }
     } catch (err: any) {
       toast.error(err.message || "Erreur de connexion");
@@ -48,84 +44,74 @@ const Login = () => {
 
   return (
     <MarketplaceLayout>
-      <div className="container py-12 flex justify-center">
-        <div className="w-full max-w-md">
-          <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
-            <div className="text-center mb-6">
-              <div className="w-14 h-14 rounded-xl marketplace-gradient flex items-center justify-center mx-auto mb-3">
-                <LogIn className="h-7 w-7 text-primary-foreground" />
-              </div>
-              <h1 className="font-display font-bold text-2xl text-foreground">
-                Connexion
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Accédez à votre compte MarketCom+
-              </p>
-            </div>
+    <div className="flex min-h-[80vh] items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center">
+          <h1 className="font-heading text-3xl font-bold">Connexion</h1>
+          <p className="mt-2 text-muted-foreground">Accédez à votre espace MarketCom+</p>
+        </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="votre@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 h-full px-3 text-muted-foreground"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full marketplace-gradient text-primary-foreground border-0 font-semibold"
-                disabled={loading}
-              >
-                {loading ? "Connexion..." : "Se connecter"}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center text-sm text-muted-foreground">
-              Pas encore de compte ?{" "}
-              <Link
-                to="/register"
-                className="text-primary font-medium hover:underline"
-              >
-                S'inscrire
-              </Link>
+        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+          {/* Sélecteur de rôle */}
+          <div>
+            <Label>Type de compte</Label>
+            <div className="mt-2 flex gap-2">
+              {([["client", "Client"], ["commercant", "Commerçant"], ["admin", "Admin"]] as const).map(([r, label]) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRole(r)}
+                  className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                    role === r ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
+
+          {/* Email */}
+          <div>
+            <Label>Email</Label>
+            <Input
+              type="email"
+              placeholder="email@exemple.mg"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+
+          {/* Mot de passe */}
+          <div>
+            <Label>Mot de passe</Label>
+            <Input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1"
+            />
+          </div>
+
+          <Button type="submit" className="w-full" size="lg" disabled={loading}>
+            {loading ? "Connexion..." : "Se connecter"}
+          </Button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          Pas encore de compte ?{" "}
+          <Link to="/register" className="font-medium text-primary hover:underline">
+            S'inscrire
+          </Link>
+        </p>
+
+        <div className="mt-4 rounded-lg bg-muted p-3 text-xs text-muted-foreground">
+          💡 Astuce : Sélectionnez un rôle et cliquez sur "Se connecter" pour accéder à l'espace correspondant.
         </div>
       </div>
+    </div>
     </MarketplaceLayout>
   );
-};
-
-export default Login;
+}

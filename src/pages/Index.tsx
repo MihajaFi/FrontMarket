@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import MarketplaceLayout from "@/components/marketplace/MarketplaceLayout";
 import HeroBanner from "@/components/marketplace/HeroBanner";
 import CategoryGrid from "@/components/marketplace/CategoryGrid";
@@ -5,7 +6,9 @@ import ProductCard from "@/components/marketplace/ProductCard";
 import { ArrowRight, Truck, Shield, Headphones, CreditCard } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-
+import { productService } from "@/services/productService"; // ajuste le chemin si besoin
+import type { Product } from "@/data/mock-data";
+import { formatPrice } from "@/data/mock-data";
 
 const features = [
   { icon: Truck, title: "Livraison Rapide", desc: "Partout dans le pays" },
@@ -15,6 +18,25 @@ const features = [
 ];
 
 const Index = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Récupère les produits
+    const fetchProducts = async () => {
+      try {
+        const data = await productService.getProducts();
+        setProducts(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <MarketplaceLayout>
       <div className="container py-4 space-y-8">
@@ -51,7 +73,19 @@ const Index = () => {
               </Button>
             </Link>
           </div>
-          
+
+          {loading ? (
+            <p>Chargement des produits...</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {products.map((p) => (
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Promo Banner */}
@@ -83,7 +117,6 @@ const Index = () => {
               </Button>
             </Link>
           </div>
-
         </section>
       </div>
     </MarketplaceLayout>

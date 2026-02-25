@@ -32,6 +32,23 @@ export interface Order {
   items: OrderItem[];
 }
 
+// types/order.ts
+
+export interface OrderItemRequest {
+  productId: number;
+  quantity: number;
+  price?: number; // optionnel si besoin
+}
+
+export interface OrderAndOrderItemRequest {
+  status: string;          // correspond à $status
+  userId: number;          // correspond à $userId
+  items: OrderItemRequest[]; // correspond à $items
+  address: string;         // correspond à $address
+  phone: string;           // correspond à $phone
+  paymentMethod: string;   // correspond à $paymentMethod
+}
+
 export interface PromotionLoyalty {
   id : number;
   promotion_type : string;

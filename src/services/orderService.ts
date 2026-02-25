@@ -1,5 +1,5 @@
 import axiosClient from "@/api/axiosClient";
-import type { Order, OrderItem } from "@/data/mock-data";
+import type { OrderAndOrderItemRequest } from "@/data/mock-data";
 
 export interface OrderItemResponse {
   id: number;
@@ -10,7 +10,7 @@ export interface OrderItemResponse {
   product_description: string;
   product_price: number;
 }
-// Interface pour la réponse backend, qui inclut l'ID généré
+
 export interface OrderResponse {
   id: number;
   orderDate: string;
@@ -24,50 +24,63 @@ export interface OrderResponse {
   items: OrderItemResponse[];
 }
 
-
 export const orderService = {
-  // Créer une commande
-  create: async (order: Order): Promise<OrderResponse> => {
-    // Mapper les items pour correspondre au backend (unitPrice au lieu de price)
-    const payload = {
-      ...order,
-      items: order.items.map((item: OrderItem) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        unitPrice: item.price, // backend attend unitPrice
-      })),
-    };
-    const response = await axiosClient.post("/orders", payload);
-    return response.data as OrderResponse; // Typage correct avec id
+
+  // ✅ CREATE
+  create: async (
+    order: OrderAndOrderItemRequest
+  ): Promise<OrderResponse> => {
+    const response = await axiosClient.post("/orders", order);
+    return response.data as OrderResponse;
   },
 
-  // Récupérer toutes les commandes
+  // GET ALL
   getAll: async (): Promise<OrderResponse[]> => {
     const response = await axiosClient.get("/orders");
-    return response.data as OrderResponse[];
+
+    return response.data.map((o: any) => ({
+      id: o.id,
+      orderDate: o.order_date,
+      totalAmount: o.total_amount,
+      status: o.status,
+      userName: o.user_name,
+      merchantName: o.merchant_name ?? "", // si pas envoyé
+      address: o.address,
+      phone: o.phone,
+      paymentMethod: o.payment_method,
+      items: o.items,
+    }));
   },
 
-  // Récupérer une commande par ID
+  // GET BY ID
   getById: async (id: number): Promise<OrderResponse> => {
     const response = await axiosClient.get(`/orders/${id}`);
-    return response.data as OrderResponse;
-  },
+    const o = response.data;
 
-  // Mettre à jour une commande
-  update: async (id: number, order: Order): Promise<OrderResponse> => {
-    const payload = {
-      ...order,
-      items: order.items.map((item: OrderItem) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        unitPrice: item.price,
-      })),
+    return {
+      id: o.id,
+      orderDate: o.order_date,
+      totalAmount: o.total_amount,
+      status: o.status,
+      userName: o.user_name,
+      merchantName: o.merchant_name ?? "",
+      address: o.address,
+      phone: o.phone,
+      paymentMethod: o.payment_method,
+      items: o.items,
     };
-    const response = await axiosClient.put(`/orders/${id}`, payload);
+  },
+
+  // UPDATE
+  update: async (
+    id: number,
+    order: OrderAndOrderItemRequest
+  ): Promise<OrderResponse> => {
+    const response = await axiosClient.put(`/orders/${id}`, order);
     return response.data as OrderResponse;
   },
 
-  // Supprimer une commande
+  // DELETE
   delete: async (id: number): Promise<{ message: string }> => {
     const response = await axiosClient.delete(`/orders/${id}`);
     return response.data;

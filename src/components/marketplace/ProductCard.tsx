@@ -1,9 +1,8 @@
-import { Star, ShoppingCart, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { ShoppingCart, Star, Heart } from "lucide-react";
 import { Product, formatPrice } from "@/data/mock-data";
 import { useCart } from "@/context/CartContext";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const VITE_IMAGE = import.meta.env.VITE_IMAGE || "";
@@ -12,7 +11,7 @@ interface ProductCardProps {
   product: Product;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -23,61 +22,52 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <Link to={`/product/${product.id}`} className="group">
-      <div className="bg-card rounded-lg border border-border overflow-hidden card-hover">
-        {/* Image */}
-        <div className="relative aspect-square overflow-hidden bg-muted">
+    <div className="group overflow-hidden rounded-xl border bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1">
+      <Link to={`/product/${product.id}`}>
+        <div className="relative aspect-square overflow-hidden">
           <img
             src={`${VITE_IMAGE}${product.image}`}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
+          <div className="absolute left-3 top-3 rounded-full bg-card/90 px-2.5 py-1 text-xs font-medium backdrop-blur-sm">
+            {product.category}
+          </div>
           {product.stock && (
-            <Badge className="absolute top-2 left-2 promo-badge text-primary-foreground border-0 text-xs font-bold">
+            <div className="absolute top-3 right-3 rounded-full bg-primary/90 px-2.5 py-1 text-xs font-bold text-primary-foreground">
               -{product.stock}%
-            </Badge>
+            </div>
           )}
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-card/80 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100"
+            className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-card/80 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors"
           >
             <Heart className="h-4 w-4" />
           </button>
         </div>
+      </Link>
 
-        {/* Content */}
-        <div className="p-3 space-y-2">
-          <p className="text-xs text-muted-foreground truncate">{product.category}</p>
-          <h3 className="font-medium text-sm text-card-foreground line-clamp-2 leading-tight min-h-[2.5rem]">
+      <div className="p-4">
+        <Link to={`/product/${product.id}`}>
+          <h3 className="font-heading text-base font-semibold line-clamp-1 group-hover:text-primary transition-colors">
             {product.name}
           </h3>
+        </Link>
+        {product.description && (
+          <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{product.description}</p>
+        )}
+        <p className="mt-1 text-xs text-muted-foreground">Vendu par {product.merchant}</p>
 
-          {/* Price */}
-          <div className="flex items-baseline gap-2">
-            <span className="font-display font-bold text-primary text-base">
-              {formatPrice(product.price)}
-            </span>
-            {product.price && (
-              <span className="text-xs text-muted-foreground line-through">
-                {formatPrice(product.price)}
-              </span>
-            )}
-          </div>
-
-          {/* Add to cart */}
-          <Button
-            onClick={handleAddToCart}
-            size="sm"
-            className="w-full marketplace-gradient text-primary-foreground border-0 text-xs font-semibold"
-          >
-            <ShoppingCart className="h-3 w-3 mr-1" />
-            Ajouter au panier
+        <div className="mt-3 flex items-center justify-between">
+          <span className="font-heading text-lg font-bold text-primary">
+            {product.price ? formatPrice(product.price) : "Prix sur demande"}
+          </span>
+          <Button size="sm" onClick={handleAddToCart}>
+            <ShoppingCart className="mr-1 h-3.5 w-3.5" />
+            Ajouter
           </Button>
         </div>
       </div>
-    </Link>
+    </div>
   );
-};
-
-export default ProductCard;
+}

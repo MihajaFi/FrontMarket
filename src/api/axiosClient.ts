@@ -19,7 +19,6 @@ axiosClient.interceptors.request.use((config) => {
     "/product",
     "/login",
     "/register",
-    "/orders",
   ];
 
   // Si ce n'est pas un endpoint public, ajouter le token
