@@ -15,7 +15,7 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-export function AdminMerchants() {
+export function MerchantDash() {
   const [list, setList] = useState<Merchant[]>([]);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -40,8 +40,8 @@ export function AdminMerchants() {
   }, []);
 
   const filtered = list.filter(m =>
-    (m.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
-    (m.city ?? "").toLowerCase().includes(search.toLowerCase())
+    m.name.toLowerCase().includes(search.toLowerCase()) ||
+    m.city.toLowerCase().includes(search.toLowerCase())
   );
 
   function openAdd() {
@@ -127,6 +127,7 @@ export function AdminMerchants() {
               <th>Commerçant</th>
               <th>Contact</th>
               <th>Ville</th>
+              <th>Catégorie</th>
               <th>Ventes totales</th>
               <th>Statut</th>
               <th>Actions</th>

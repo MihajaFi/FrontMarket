@@ -145,6 +145,13 @@ export interface CategoryRequest {
   color?: string | null;   // champ optionnel (peut être null)
 }
 
+export interface DashboardResponse {
+  totalSell: number;
+  totalProducts: number;
+  totalMerchant: number;
+  orderPending: number;
+}
+
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat("fr-FR").format(price) + " Ar";
 };
