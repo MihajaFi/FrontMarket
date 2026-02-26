@@ -3,6 +3,7 @@ import { Layout } from "@/components/Layout";
 import { merchantService } from "@/services";
 import { Merchant } from "@/data/mock-data";
 import { Plus, Pencil, Trash2, Search, Store } from "lucide-react";
+import emailjs from "@emailjs/browser";
 
 const COLORS = ["#10b981", "#3b82f6", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4"];
 
@@ -16,6 +17,14 @@ function initials(name: string) {
 }
 
 export function AdminMerchants() {
+
+  const SERVICE_ID = 
+            (import.meta.env as Record<string, string>).VITE_PUBLIC_EMAILJS_SERVICE_ID!;
+  const TEMPLATE_ID =
+            (import.meta.env as Record<string, string>).VITE_PUBLIC_EMAILJS_TEMPLATE_ID!;
+  const PUBLIC_KEY = 
+             (import.meta.env as Record<string, string>).VITE_PUBLIC_EMAILJS_PUBLIC_KEY!;
+
   const [list, setList] = useState<Merchant[]>([]);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -67,6 +76,19 @@ export function AdminMerchants() {
     });
     setModalOpen(true);
   }
+   const sendEmailCode = async (email: string, code: string) => {
+    try {
+      await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        { to_email: email, code: code },
+        PUBLIC_KEY,
+      );
+    } catch (err) {
+      console.error("Erreur EmailJS :", err);
+    }
+  };
+
   async function handleSave() {
     if (!form.name.trim()) return;
 
@@ -86,8 +108,10 @@ export function AdminMerchants() {
 
         setList(l => [newMerchant, ...l]);
 
+        await sendEmailCode(response.merchant.email, response.generatedPassword);
+
         alert(
-          `Commerçant créé !\nEmail: ${response.merchant.email}\nMot de passe: ${response.generatedPassword}`
+          `Commerçant créé !`
         );
       }
       setModalOpen(false);
