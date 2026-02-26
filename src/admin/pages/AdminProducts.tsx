@@ -1,21 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { Layout } from '@/components/Layout';
-import { Product, ProductRequest, Merchant } from '@/data/mock-data';
+import { Product, ProductRequest, Merchant, CategoryResponse } from '@/data/mock-data';
 import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
 import { merchantProductService } from '@/services/merchantProductService';
 import { merchantService } from '@/services/adminMerchantService';
 import { formatPrice } from '@/services/merchantProductService';
+import { categoryService } from '@/services/categorieService';
 
 export function AdminProducts() {
   const [list, setList] = useState<Product[]>([]);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
+  const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState<ProductRequest>({
     name: '',
     description: '',
-    category: '',
+    categoryId: 0,
     merchantId: 0,
     price: 0,
     image: undefined
@@ -28,6 +30,7 @@ export function AdminProducts() {
   useEffect(() => {
     fetchProducts();
     fetchMerchants();
+    fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
@@ -36,6 +39,14 @@ export function AdminProducts() {
       setList(data);
     } catch (error) {
       console.error("Erreur chargement produits :", error);
+    }
+  };
+  const fetchCategories = async () => {
+    try {
+      const data = await categoryService.getAll();
+      setCategories(data);
+    } catch (error) {
+      console.error("Erreur chargement catégories :", error);
     }
   };
 
@@ -56,7 +67,7 @@ export function AdminProducts() {
     setForm({
       name: '',
       description: '',
-      category: '',
+      categoryId: categories[0]?.id || 0,
       merchantId: merchants[0]?.id || 0,
       price: 0,
       image: undefined
@@ -68,11 +79,12 @@ export function AdminProducts() {
   // --- Modal ouverture édition ---
   function openEdit(p: Product) {
     const merchant = merchants.find(m => m.name === p.merchant);
+    const category = categories.find(c => c.name === p.category);
     setEditing(p);
     setForm({
       name: p.name,
       description: p.description,
-      category: p.category,
+      categoryId: category ? category.id : 0,
       merchantId: merchant ? merchant.id : 0,
       price: p.price || 0,
       image: undefined
@@ -93,7 +105,7 @@ export function AdminProducts() {
 
   // --- Enregistrement produit ---
   const handleSave = async () => {
-    if (!form.name || !form.category || !form.merchantId || !form.price) {
+    if (!form.name || !form.categoryId || !form.merchantId || !form.price) {
       alert("Tous les champs obligatoires doivent être remplis !");
       return;
     }
@@ -188,12 +200,31 @@ export function AdminProducts() {
               <label>Prix *</label>
               <input type="number" className="form-input" value={form.price} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))} />
               <label>Catégorie *</label>
-              <input className="form-input" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} />
-              <label>Commerçant *</label>
-              <select className="form-input" value={form.merchantId} onChange={e => setForm(f => ({ ...f, merchantId: Number(e.target.value) }))}>
-                {merchants.map(m => (
-                  <option key={m.id} value={m.id}>{m.name}</option>
+              <select className="form-input" value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: Number(e.target.value) }))}>
+                {categories.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
+              </select>
+              <label>Commerçant *</label>
+              <select
+                className="form-input"
+                value={form.merchantId}
+                onChange={e =>
+                  setForm(f => ({
+                    ...f,
+                    merchantId: Number(e.target.value)
+                  }))
+                }
+              >
+                {merchants.length === 0 ? (
+                  <option value={0}>Aucun commerçant</option>
+                ) : (
+                  merchants.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))
+                )}
               </select>
               <label>Image</label>
               <input type="file" ref={fileInputRef} onChange={handleFileChange} />

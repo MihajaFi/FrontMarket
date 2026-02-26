@@ -34,7 +34,7 @@ export const merchantProductService = {
   formData.append("name", productRequest.name);
   formData.append("description", productRequest.description);
   formData.append("merchantId", productRequest.merchantId.toString());
-  formData.append("category", productRequest.category);
+  formData.append("categoryId", productRequest.categoryId.toString());
   formData.append("price", productRequest.price.toString());
 
   if (productRequest.image) {
@@ -66,7 +66,7 @@ export const merchantProductService = {
     formData.append("name", productRequest.name);
     formData.append("description", productRequest.description);
     formData.append("merchantId", productRequest.merchantId.toString());
-    formData.append("category", productRequest.category);
+    formData.append("categoryId", productRequest.categoryId.toString());
     formData.append("price", productRequest.price.toString());
 
     if (productRequest.image) {

@@ -12,9 +12,19 @@ export interface ProductRequest {
   name: string;
   description: string;
   merchantId: number;
-  category: string;
+  categoryId: number;
   price: number;
   image?: File;
+}
+export interface ProductResponse {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  price?: number;
+  stock?: number;
+  image: string;
+  merchant: string
 }
 
 export interface OrderItem {
@@ -92,7 +102,6 @@ export type Merchant = {
   email: string;
   phone: string;
   city: string;
-  category: string;
   status: 'actif' | 'inactif';
   joinDate: string;
   totalSales: number;
@@ -103,7 +112,6 @@ export type MerchantCreate = {
   email: string;
   phone: string;
   city: string;
-  category: string;
   status: "actif" | "inactif";
 };
 
@@ -120,6 +128,20 @@ export interface StockRequest {
   quantity: number;
   alert: string;
   productId: number;
+}
+
+export interface CategoryResponse {
+  id: number;
+  name: string;
+  description?: string | null; // correspond à ?string en PHP
+  color: string;
+  productCount: number;
+}
+
+export interface CategoryRequest {
+  name: string;            // champ obligatoire
+  description: string;     // champ obligatoire
+  color?: string | null;   // champ optionnel (peut être null)
 }
 
 export const formatPrice = (price: number): string => {

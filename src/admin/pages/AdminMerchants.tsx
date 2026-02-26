@@ -28,7 +28,6 @@ export function AdminMerchants() {
     email: "",
     phone: "",
     city: "",
-    category: "",
     status: "actif" as "actif" | "inactif",
   });
 
@@ -45,8 +44,7 @@ export function AdminMerchants() {
   /* ================= FILTER ================= */
   const filtered = list.filter(m =>
     m.name.toLowerCase().includes(search.toLowerCase()) ||
-    m.city.toLowerCase().includes(search.toLowerCase()) ||
-    m.category.toLowerCase().includes(search.toLowerCase())
+    m.city.toLowerCase().includes(search.toLowerCase())
   );
 
   /* ================= MODALS ================= */
@@ -57,7 +55,6 @@ export function AdminMerchants() {
       email: "",
       phone: "",
       city: "",
-      category: "",
       status: "actif",
     });
     setModalOpen(true);
@@ -70,7 +67,6 @@ export function AdminMerchants() {
       email: m.email,
       phone: m.phone,
       city: m.city,
-      category: m.category,
       status: m.status,
     });
     setModalOpen(true);
@@ -160,12 +156,6 @@ export function AdminMerchants() {
                   <div style={{ fontSize: '0.75rem', color: 'hsl(var(--muted-foreground))' }}>{m.phone}</div>
                 </td>
                 <td>{m.city}</td>
-                <td>
-                  <span style={{
-                    padding: '0.2rem 0.6rem', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 600,
-                    background: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))',
-                  }}>{m.category}</span>
-                </td>
                 <td style={{ fontWeight: 600 }}>{m.totalSales.toLocaleString()} MAD</td>
                 <td>
                   <span className={m.status === 'actif' ? 'badge-validated' : 'badge-cancelled'} style={{
@@ -207,10 +197,6 @@ export function AdminMerchants() {
               <div>
                 <label className="form-label">Ville</label>
                 <input className="form-input" value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="Casablanca" />
-              </div>
-              <div>
-                <label className="form-label">Catégorie</label>
-                <input className="form-input" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="Vêtements, Alimentation..." />
               </div>
               <div>
                 <label className="form-label">Statut</label>
