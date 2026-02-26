@@ -185,7 +185,7 @@ export function MerchantLayout({ children, title, subtitle }: LayoutProps) {
                                 className="avatar"
                                 style={{ background: 'hsl(var(--primary))', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700 }}
                             >
-                                A
+                                M
                             </div>
                             <div>
                                 <div
@@ -195,7 +195,7 @@ export function MerchantLayout({ children, title, subtitle }: LayoutProps) {
                                         color: 'white',
                                     }}
                                 >
-                                    Admin
+                                    Merchant
                                 </div>
                                 <div
                                     style={{
@@ -203,7 +203,7 @@ export function MerchantLayout({ children, title, subtitle }: LayoutProps) {
                                         color: 'hsl(var(--sidebar-text))',
                                     }}
                                 >
-                                    Administrateur
+                                    Commercant
                                 </div>
                             </div>
                         </div>
@@ -305,7 +305,7 @@ export function MerchantLayout({ children, title, subtitle }: LayoutProps) {
                                 cursor: 'pointer',
                             }}
                         >
-                            A
+                                M
                         </div>
                     </div>
                 </header>
