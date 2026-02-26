@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Store, Tag, Package, ShoppingCart,
-  BarChart2, Gift, Menu, TrendingUp, Bell, ChevronDown
+  BarChart2, Gift, Menu, TrendingUp, Bell, ChevronDown,
+  LogOut
 } from 'lucide-react';
 import Logo from '@/assets/Logo.png';
 const navItems = [
@@ -38,12 +39,10 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
-    // Supprime les données d'authentification
     localStorage.removeItem("mc_token");
     localStorage.removeItem("mc_user");
-
-    // Redirection vers la page login /
     navigate("/", { replace: true });
+    window.location.reload();
   };
 
   return (
@@ -59,7 +58,6 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
               : 'translateX(-100%)',
         }}
       >
-        {/* Logo */}
         {/* Logo */}
         <div
           style={{
@@ -177,49 +175,53 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
             style={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'space-between', // espace entre infos et logout
               gap: '0.75rem',
-              marginBottom: '0.75rem',
             }}
           >
-            <div
-              className="avatar"
-              style={{ background: 'hsl(var(--primary))' }}
-            >
-              A
-            </div>
-            <div style={{ flex: 1 }}>
+            {/* Avatar + infos */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <div
-                style={{
-                  fontSize: '0.8125rem',
-                  fontWeight: 600,
-                  color: 'white',
-                }}
+                className="avatar"
+                style={{ background: 'hsl(var(--primary))', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700 }}
               >
-                Admin
+                A
               </div>
-              <div
-                style={{
-                  fontSize: '0.7rem',
-                  color: 'hsl(var(--sidebar-text))',
-                }}
-              >
-                Administrateur
+              <div>
+                <div
+                  style={{
+                    fontSize: '0.8125rem',
+                    fontWeight: 600,
+                    color: 'white',
+                  }}
+                >
+                  Admin
+                </div>
+                <div
+                  style={{
+                    fontSize: '0.7rem',
+                    color: 'hsl(var(--sidebar-text))',
+                  }}
+                >
+                  Administrateur
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="sidebar-link"
-            style={{
-              width: '100%',
-              justifyContent: 'flex-start',
-              color: 'hsl(var(--destructive))',
-            }}
-          >
-            Déconnexion
-          </button>
+            {/* Logout icône */}
+            <button
+              onClick={handleLogout}
+              className="sidebar-link"
+              style={{
+                justifyContent: 'center',
+                color: 'hsl(var(--destructive))',
+                padding: '0.5rem',
+              }}
+              title="Déconnexion"
+            >
+              <LogOut size={20} />
+            </button>
+          </div>
         </div>
       </aside>
 

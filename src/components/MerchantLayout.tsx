@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-    LayoutDashboard, Store, Tag, Package, ShoppingCart,
-    BarChart2, Gift, Menu, X, TrendingUp, Bell, ChevronDown
+    LayoutDashboard, Tag, Package, ShoppingCart,
+    BarChart2, Gift, Menu, Bell, LogOut
 } from 'lucide-react';
 import Logo from '@/assets/Logo.png';
+
 const navItems = [
     { label: 'Tableau de bord', icon: LayoutDashboard, path: '/merchant/dashboard' },
     {
@@ -46,68 +47,124 @@ export function MerchantLayout({ children, title, subtitle }: LayoutProps) {
     };
     return (
         <div style={{ display: 'flex', minHeight: '100vh' }}>
-            {/* Sidebar */}
-            <aside className={`sidebar ${sidebarOpen ? '' : 'sidebar-hidden'}`}
-                style={{ transform: sidebarOpen || window.innerWidth >= 1024 ? 'translateX(0)' : 'translateX(-100%)' }}>
 
+            {/* Sidebar */}
+            <aside
+                className={`sidebar ${sidebarOpen ? '' : 'sidebar-hidden'}`}
+                style={{
+                    transform:
+                        sidebarOpen || window.innerWidth >= 1024
+                            ? 'translateX(0)'
+                            : 'translateX(-100%)',
+                }}
+            >
                 {/* Logo */}
                 <div
                     style={{
-                        width: '3rem',
-                        height: '3rem',
-                        borderRadius: '0.5rem',
+                        padding: '1.25rem 1.5rem',
+                        borderBottom: '1px solid hsl(var(--sidebar-border))',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'transparent', // on peut garder transparent si l'image a son fond
+                        gap: '0.75rem',
                     }}
                 >
-                    <img
-                        src={Logo}
-                        alt="Logo MarketCom+"
+                    {/* Logo image */}
+                    <div
                         style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'contain',
+                            width: '3rem',
+                            height: '3rem',
+                            borderRadius: '0.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: 'transparent', // on peut garder transparent si l'image a son fond
                         }}
-                    />
+                    >
+                        <img
+                            src={Logo}
+                            alt="Logo MarketCom+"
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'contain',
+                            }}
+                        />
+                    </div>
+
+                    {/* Texte */}
+                    <div>
+                        <div
+                            style={{
+                                fontSize: '0.95rem',
+                                fontWeight: 700,
+                                color: 'white',
+                                lineHeight: 1.2,
+                            }}
+                        >
+                            MarketCom +
+                        </div>
+                        <div
+                            style={{
+                                fontSize: '0.7rem',
+                                color: 'hsl(var(--sidebar-text))',
+                                letterSpacing: '0.05em',
+                            }}
+                        >
+                            Gestion Commerciale
+                        </div>
+                    </div>
                 </div>
 
-                {/* Nav */}
-                <nav style={{ flex: 1, paddingTop: '0.5rem', paddingBottom: '1rem', overflowY: 'auto' }}>
-                    {/* Direct items */}
-                    {navItems.filter(i => !('section' in i)).map((item: any) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <item.icon size={18} />
-                            {item.label}
-                        </Link>
-                    ))}
+                {/* Navigation */}
+                <nav
+                    style={{
+                        flex: 1,
+                        paddingTop: '0.5rem',
+                        paddingBottom: '1rem',
+                        overflowY: 'auto',
+                    }}
+                >
+                    {/* Items directs */}
+                    {navItems
+                        .filter((i) => !('section' in i))
+                        .map((item: any) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`sidebar-link ${location.pathname === item.path ? 'active' : ''
+                                    }`}
+                                onClick={() => setSidebarOpen(false)}
+                            >
+                                <item.icon size={18} />
+                                {item.label}
+                            </Link>
+                        ))}
 
-                    {/* Sectioned items */}
-                    {navItems.filter(i => 'section' in i).map((section: any) => (
-                        <div key={section.section}>
-                            <div className="sidebar-section">{section.section}</div>
-                            {section.items.map((item: any) => (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
-                                    onClick={() => setSidebarOpen(false)}
-                                >
-                                    <item.icon size={18} />
-                                    {item.label}
-                                </Link>
-                            ))}
-                        </div>
-                    ))}
+                    {/* Sections */}
+                    {navItems
+                        .filter((i) => 'section' in i)
+                        .map((section: any) => (
+                            <div key={section.section}>
+                                <div className="sidebar-section">
+                                    {section.section}
+                                </div>
+                                {section.items.map((item: any) => (
+                                    <Link
+                                        key={item.path}
+                                        to={item.path}
+                                        className={`sidebar-link ${location.pathname === item.path ? 'active' : ''
+                                            }`}
+                                        onClick={() => setSidebarOpen(false)}
+                                    >
+                                        <item.icon size={18} />
+                                        {item.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        ))}
                 </nav>
 
-                {/* User footer */}
+                {/* Footer utilisateur */}
                 <div
                     style={{
                         borderTop: '1px solid hsl(var(--sidebar-border))',
@@ -118,56 +175,65 @@ export function MerchantLayout({ children, title, subtitle }: LayoutProps) {
                         style={{
                             display: 'flex',
                             alignItems: 'center',
+                            justifyContent: 'space-between', // espace entre infos et logout
                             gap: '0.75rem',
-                            marginBottom: '0.75rem',
                         }}
                     >
-                        <div className="avatar" style={{ background: 'hsl(var(--primary))' }}>
-                            A
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
+                        {/* Avatar + infos */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <div
-                                style={{
-                                    fontSize: '0.8125rem',
-                                    fontWeight: 600,
-                                    color: 'white',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                }}
+                                className="avatar"
+                                style={{ background: 'hsl(var(--primary))', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700 }}
                             >
-                                Merchant
+                                A
                             </div>
-                            <div
-                                style={{
-                                    fontSize: '0.7rem',
-                                    color: 'hsl(var(--sidebar-text))',
-                                }}
-                            >
-                                Commerçant
+                            <div>
+                                <div
+                                    style={{
+                                        fontSize: '0.8125rem',
+                                        fontWeight: 600,
+                                        color: 'white',
+                                    }}
+                                >
+                                    Admin
+                                </div>
+                                <div
+                                    style={{
+                                        fontSize: '0.7rem',
+                                        color: 'hsl(var(--sidebar-text))',
+                                    }}
+                                >
+                                    Administrateur
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Logout button */}
-                    <button
-                        onClick={handleLogout}
-                        className="sidebar-link"
-                        style={{
-                            width: '100%',
-                            justifyContent: 'flex-start',
-                            color: 'hsl(var(--destructive))',
-                        }}
-                    >
-                        Déconnexion
-                    </button>
+                        {/* Logout icône */}
+                        <button
+                            onClick={handleLogout}
+                            className="sidebar-link"
+                            style={{
+                                justifyContent: 'center',
+                                color: 'hsl(var(--destructive))',
+                                padding: '0.5rem',
+                            }}
+                            title="Déconnexion"
+                        >
+                            <LogOut size={20} />
+                        </button>
+                    </div>
                 </div>
             </aside>
 
-            {/* Backdrop for mobile */}
+            {/* Overlay mobile */}
             {sidebarOpen && (
                 <div
-                    style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 35 }}
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0,0,0,0.4)',
+                        zIndex: 35,
+                    }}
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
@@ -176,30 +242,75 @@ export function MerchantLayout({ children, title, subtitle }: LayoutProps) {
             <div className="main-content" style={{ flex: 1 }}>
                 {/* Topbar */}
                 <header className="topbar">
-                    <button className="btn-ghost" style={{ marginRight: '1rem', display: 'none' }} onClick={() => setSidebarOpen(true)}>
+                    <button
+                        className="btn-ghost"
+                        style={{ marginRight: '1rem' }}
+                        onClick={() => setSidebarOpen(true)}
+                    >
                         <Menu size={18} />
                     </button>
 
                     <div style={{ flex: 1 }}>
-                        <h1 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>{title}</h1>
-                        {subtitle && <p style={{ fontSize: '0.8rem', color: 'hsl(var(--muted-foreground))', margin: 0 }}>{subtitle}</p>}
+                        <h1
+                            style={{
+                                fontSize: '1.1rem',
+                                fontWeight: 700,
+                                margin: 0,
+                            }}
+                        >
+                            {title}
+                        </h1>
+                        {subtitle && (
+                            <p
+                                style={{
+                                    fontSize: '0.8rem',
+                                    color: 'hsl(var(--muted-foreground))',
+                                    margin: 0,
+                                }}
+                            >
+                                {subtitle}
+                            </p>
+                        )}
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <button className="btn-ghost" style={{ position: 'relative', padding: '0.5rem' }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                        }}
+                    >
+                        <button
+                            className="btn-ghost"
+                            style={{ position: 'relative', padding: '0.5rem' }}
+                        >
                             <Bell size={18} />
-                            <span style={{
-                                position: 'absolute', top: '4px', right: '4px',
-                                width: '8px', height: '8px', borderRadius: '50%',
-                                background: 'hsl(var(--destructive))',
-                                border: '2px solid hsl(var(--card))',
-                            }} />
+                            <span
+                                style={{
+                                    position: 'absolute',
+                                    top: '4px',
+                                    right: '4px',
+                                    width: '8px',
+                                    height: '8px',
+                                    borderRadius: '50%',
+                                    background: 'hsl(var(--destructive))',
+                                }}
+                            />
                         </button>
-                        <div className="avatar" style={{ background: 'hsl(var(--primary))', cursor: 'pointer' }}>A</div>
+
+                        <div
+                            className="avatar"
+                            style={{
+                                background: 'hsl(var(--primary))',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            A
+                        </div>
                     </div>
                 </header>
 
-                {/* Page content */}
+                {/* Contenu page */}
                 <main style={{ padding: '1.5rem' }}>
                     {children}
                 </main>
