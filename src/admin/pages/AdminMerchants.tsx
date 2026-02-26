@@ -177,7 +177,7 @@ export function AdminMerchants() {
                   <div style={{ fontSize: '0.75rem', color: 'hsl(var(--muted-foreground))' }}>{m.phone}</div>
                 </td>
                 <td>{m.city}</td>
-                <td style={{ fontWeight: 600 }}>{m.totalSales.toLocaleString()} MAD</td>
+                <td style={{ fontWeight: 600 }}>{m.totalSales.toLocaleString()} produits</td>
                 <td>
                   <span className={m.status === 'actif' ? 'badge-validated' : 'badge-cancelled'} style={{
                     padding: '0.25rem 0.625rem', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 600,

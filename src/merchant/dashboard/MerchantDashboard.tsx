@@ -15,7 +15,7 @@ const pendingOrders = orders.filter(o => o.status === 'en_attente').length;
 const statCards = [
   {
     label: 'Total des ventes',
-    value: `${(totalSales / 1000).toFixed(0)}k MAD`,
+    value: `${(totalSales / 1000).toFixed(0)}k Ar`,
     icon: TrendingUp,
     iconBg: 'hsl(var(--stat-sales) / 0.12)',
     iconColor: 'hsl(var(--stat-sales))',
@@ -95,7 +95,7 @@ export default function MerchantDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
         {/* Sales area chart */}
         <div className="chart-card">
-          <div className="chart-title">Évolution des ventes (MAD)</div>
+          <div className="chart-title">Évolution des ventes (Ar)</div>
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={salesByMonth} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <defs>
@@ -107,7 +107,7 @@ export default function MerchantDashboard() {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(214 32% 88%)" />
               <XAxis dataKey="month" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v / 1000}k`} />
-              <Tooltip formatter={(v: number) => [`${v.toLocaleString()} MAD`, 'Ventes']} />
+              <Tooltip formatter={(v: number) => [`${v.toLocaleString()} Ar`, 'Ventes']} />
               <Area type="monotone" dataKey="ventes" stroke="#10b981" strokeWidth={2.5} fill="url(#salesGrad)" />
             </AreaChart>
           </ResponsiveContainer>
@@ -124,7 +124,7 @@ export default function MerchantDashboard() {
                   <Cell key={i} fill={COLORS[i % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(v: number) => [`${v.toLocaleString()} MAD`]} />
+              <Tooltip formatter={(v: number) => [`${v.toLocaleString()} Ar`]} />
             </PieChart>
           </ResponsiveContainer>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', marginTop: '0.25rem' }}>
@@ -194,7 +194,7 @@ export default function MerchantDashboard() {
               <tr key={order.id}>
                 <td><code style={{ fontSize: '0.8rem', color: 'hsl(var(--primary))' }}>{order.id}</code></td>
                 <td style={{ fontWeight: 500 }}>{order.customer}</td>
-                <td style={{ fontWeight: 600 }}>{order.total.toLocaleString()} MAD</td>
+                <td style={{ fontWeight: 600 }}>{order.total.toLocaleString()} Ar</td>
                 <td style={{ color: 'hsl(var(--muted-foreground))' }}>{order.date}</td>
                 <td><StatusBadge status={order.status} /></td>
               </tr>

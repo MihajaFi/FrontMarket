@@ -17,10 +17,10 @@ export default function Login() {
   const [role, setRole] = useState<"client" | "commercant" | "admin">("client");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState("");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setErrorMessage("");
     if (!email.trim() || !password.trim()) {
       toast.error("Veuillez remplir tous les champs");
       return;
@@ -56,6 +56,7 @@ export default function Login() {
 
     } catch (err: any) {
       toast.error(err.message || "Erreur de connexion");
+      setErrorMessage("L'email ou mot de passe incorrect.");
     } finally {
       setLoading(false);
     }
@@ -104,23 +105,17 @@ export default function Login() {
             </div>
 
             {/* Mot de passe */}
-            <div className="relative">
               <Label>Mot de passe</Label>
-              <Input
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
+            <div className="relative">
+                  <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                  <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full px-3 text-muted-foreground" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                  {/* Affichage de l'erreur inline */}
+            {errorMessage && (
+              <p className="text-sm text-red-500">{errorMessage}</p>
+            )}
+                </div>
 
             <Button type="submit" className="w-full" size="lg" disabled={loading}>
               {loading ? "Connexion..." : "Se connecter"}
