@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import logo from "@/assets/Logo.png";
 const MarketplaceHeader = () => {
   const { totalItems } = useCart();
   const { isAuthenticated, user, logout } = useAuth();
@@ -38,15 +38,18 @@ const MarketplaceHeader = () => {
         <div className="container flex items-center justify-between gap-4 py-3">
 
           {/* Logo - gauche */}
-          <Link to="/" className="flex items-center gap-1 shrink-0">
-            <div className="w-8 h-8 rounded-lg marketplace-gradient flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm font-display">M+</span>
+          <Link to="/" className="flex items-center gap-2 shrink-0">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center">
+              <img
+                src={logo}
+                alt="Logo MarketCom+"
+                className="w-10 h-5 sm:w-20 sm:h-10 object-contain"
+              />
             </div>
-            <span className="hidden sm:block font-display font-bold text-lg text-foreground">
+            <span className="hidden sm:block font-display font-bold text-lg sm:text-2xl text-foreground">
               Market<span className="text-primary">Com+</span>
             </span>
           </Link>
-
           {/* Recherche - centre */}
           <form onSubmit={handleSearch} className="flex-1 max-w-2xl mx-4">
             <div className="relative flex">
