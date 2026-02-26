@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Layout } from '@/components/Layout';
+import { MerchantLayout } from "@/components/MerchantLayout";
 import { stockService } from '@/services/stockService';
 import { merchantProductService } from '@/services/merchantProductService';
 import type { StockResponse, StockRequest, Product } from '@/data/mock-data';
 import { AlertTriangle, TrendingDown, CheckCircle, Pencil, Plus, Trash2, Search } from 'lucide-react';
 
-export function AdminStock() {
+export function MerchantStock() {
   const [list, setList] = useState<StockResponse[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
@@ -99,7 +99,7 @@ export function AdminStock() {
   }
 
   return (
-    <Layout title="Gestion des stocks" subtitle="Suivi des niveaux de stock">
+    <MerchantLayout title="Gestion des stocks" subtitle="Suivi des niveaux de stock">
       {/* Recherche + Ajouter */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div className="search-bar">
@@ -201,6 +201,6 @@ export function AdminStock() {
           </div>
         </div>
       )}
-    </Layout>
+    </MerchantLayout>
   );
 }

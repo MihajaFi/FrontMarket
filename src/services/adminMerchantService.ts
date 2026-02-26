@@ -13,9 +13,15 @@ export const merchantService = {
     return data;
   },
 
-  async create(merchant: MerchantCreate): Promise<Merchant> {
-  const { data } = await axiosClient.post<Merchant>("/merchants", merchant);
-  return data;
+  async create(merchant: MerchantCreate): Promise<{
+    merchant: Merchant;
+    generatedPassword: string;
+  }> {
+    const { data } = await axiosClient.post(
+      "/merchants",
+      merchant
+    );
+    return data;
   },
 
   async update(id: number, merchant: Partial<Merchant>): Promise<Merchant> {

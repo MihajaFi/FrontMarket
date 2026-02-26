@@ -19,11 +19,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Layout } from "@/components/Layout";
+import { MerchantLayout } from "@/components/MerchantLayout";
 import type { CategoryResponse, CategoryRequest } from "@/data/mock-data";
 
 
-export function AdminCategories() {
+export function MerchantCategories() {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
@@ -96,7 +96,7 @@ export function AdminCategories() {
   };
 
   return (
-    <Layout title="Catégories" subtitle="Gérez les catégories de produits">
+    <MerchantLayout title="Catégories" subtitle="Gérez les catégories de produits">
       {/* Toolbar */}
       <div
         style={{
@@ -212,6 +212,6 @@ export function AdminCategories() {
           </Table>
         </div>
       </div>
-    </Layout>
+    </MerchantLayout>
   );
 }

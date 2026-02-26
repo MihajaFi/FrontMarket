@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Layout } from "@/components/Layout";
+import { MerchantLayout } from "@/components/MerchantLayout";
 import { orderService, OrderResponse } from "@/services/orderService";
 import { Search, Eye, ShoppingCart } from "lucide-react";
 
@@ -15,7 +15,7 @@ const statusConfig: Record<
   CANCELLED: { label: "Annulée", cls: "badge-cancelled" },
 };
 
-export function AdminOrders() {
+export function MerchantOrders() {
   const [list, setList] = useState<OrderResponse[]>([]);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | OrderResponse["status"]>("all");
@@ -64,7 +64,7 @@ export function AdminOrders() {
   );
 
   return (
-    <Layout title="Commandes" subtitle={`${list.length} commande(s) au total`}>
+    <MerchantLayout title="Commandes" subtitle={`${list.length} commande(s) au total`}>
       {/* STATUS SUMMARY */}
       <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem", flexWrap: "wrap" }}>
         {STATUS_OPTIONS.map(s => (
@@ -188,7 +188,7 @@ export function AdminOrders() {
           </div>
         </div>
       )}
-    </Layout>
+    </MerchantLayout>
   );
 }
 

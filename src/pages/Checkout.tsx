@@ -11,6 +11,9 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { MapPin, CreditCard, CheckCircle2, ArrowLeft, ArrowRight, Phone, Loader2 } from "lucide-react";
 import type { OrderAndOrderItemRequest } from "@/data/mock-data";
+import OrangeLogo from "@/assets/Orange.png";
+import MvolaLogo from "@/assets/telma.png";
+import AirtelLogo from "@/assets/airtel.png";
 
 type Step = "address" | "summary" | "payment" | "confirmation";
 const VITE_IMAGE = import.meta.env.VITE_IMAGE || "";
@@ -201,20 +204,23 @@ const Checkout = () => {
                 <Label>Opérateur</Label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { id: "orange", label: "Orange Money", color: "bg-orange-500" },
-                    { id: "mvola", label: "MVola", color: "bg-red-500" },
-                    { id: "airtel", label: "Airtel Money", color: "bg-red-600" },
+                    { id: "orange", label: "Orange Money", logo: OrangeLogo },
+                    { id: "mvola", label: "MVola", logo: MvolaLogo },
+                    { id: "airtel", label: "Airtel Money", logo: AirtelLogo },
                   ].map((op) => (
                     <button
                       key={op.id}
                       type="button"
                       onClick={() => setMomoProvider(op.id)}
                       className={`p-3 rounded-lg border-2 text-center text-sm font-medium transition-colors ${momoProvider === op.id
-                          ? "border-primary bg-primary/5 text-primary"
-                          : "border-border text-muted-foreground hover:border-primary/50"
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border text-muted-foreground hover:border-primary/50"
                         }`}
                     >
-                      <div className={`w-6 h-6 rounded-full ${op.color} mx-auto mb-1`} />
+                      <img
+                        src={op.logo}
+                        className="w-10 h-10 mx-auto mb-1 object-contain"
+                      />
                       {op.label}
                     </button>
                   ))}

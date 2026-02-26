@@ -1,10 +1,10 @@
-import { Layout } from '@/components/Layout';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 import { salesByMonth, salesByMerchant, stockByCategory, merchants, products, orders } from '@/data/mockData';
 import { TrendingUp, Package, Store, ShoppingCart, AlertTriangle } from 'lucide-react';
+import { MerchantLayout } from '@/components/MerchantLayout';
   
 const COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4'];
 
@@ -51,9 +51,9 @@ const statCards = [
   },
 ];
 
-export default function AdminDashboard() {
+export default function MerchantDashboard() {
   return (
-    <Layout title="Tableau de bord" subtitle="Vue d'ensemble de votre activité commerciale">
+    <MerchantLayout title="Tableau de bord" subtitle="Vue d'ensemble de votre activité commerciale">
       {/* Alert if low stock */}
       {lowStock > 0 && (
         <div style={{
@@ -202,7 +202,7 @@ export default function AdminDashboard() {
           </tbody>
         </table>
       </div>
-    </Layout>
+    </MerchantLayout>
   );
 }
 

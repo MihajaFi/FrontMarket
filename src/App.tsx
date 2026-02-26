@@ -16,8 +16,11 @@ import OrderTracking from "./pages/OrderTracking";
 import Loyalty from "./pages/Loyalty";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./admin/dashboard/AdminDashboard";
+import MerchantDashboard from "./merchant/dashboard/MerchantDashboard";
 import { AdminMerchants, AdminProducts, AdminOrders, AdminPromotions, AdminStock, PromotionLoyalty, AdminCategories } from "./admin/pages";
+import { MerchantProducts, MerchantOrders, MerchantPromotions, MerchantStock, MerchantPromotionLoyalty, MerchantCategories } from "./merchant/pages";
 import AdminRoute from "./routes/AdminRoute";
+import MerchantRoute from "./routes/MerchantRoute";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +55,16 @@ const App = () => (
               <Route path="/admin/stock" element={<AdminRoute><AdminStock /></AdminRoute>} />
               <Route path="/admin/promotion-loyalty" element={<AdminRoute><PromotionLoyalty /></AdminRoute>} />
               <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
+              
+              {/* Merchant routes */}
+              <Route path="/merchant/dashboard" element={<MerchantRoute><MerchantDashboard /></MerchantRoute>} />
+              <Route path="/merchant/products" element={<MerchantRoute><MerchantProducts /></MerchantRoute>} />
+              <Route path="/merchant/orders" element={<MerchantRoute><MerchantOrders /></MerchantRoute>} />
+              <Route path="/merchant/promotions" element={<MerchantRoute><MerchantPromotions /></MerchantRoute>} />
+              <Route path="/merchant/stock" element={<MerchantRoute><MerchantStock /></MerchantRoute>} />
+              <Route path="/merchant/promotion-loyalty" element={<MerchantRoute><MerchantPromotionLoyalty /></MerchantRoute>} />
+              <Route path="/merchant/categories" element={<MerchantRoute><MerchantCategories /></MerchantRoute>} />
+
               {/* Fallback */}
               <Route path="*" element={<NotFound />} />
             </Routes>

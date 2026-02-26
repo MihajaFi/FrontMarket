@@ -3,6 +3,7 @@ import { Layout } from "@/components/Layout";
 import { merchantService } from "@/services";
 import { Merchant } from "@/data/mock-data";
 import { Plus, Pencil, Trash2, Search, Store } from "lucide-react";
+import emailjs from "@emailjs/browser";
 
 const COLORS = ["#10b981", "#3b82f6", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4"];
 
@@ -16,6 +17,14 @@ function initials(name: string) {
 }
 
 export function AdminMerchants() {
+
+  const SERVICE_ID = 
+            (import.meta.env as Record<string, string>).VITE_PUBLIC_EMAILJS_SERVICE_ID!;
+  const TEMPLATE_ID =
+            (import.meta.env as Record<string, string>).VITE_PUBLIC_EMAILJS_TEMPLATE_ID!;
+  const PUBLIC_KEY = 
+             (import.meta.env as Record<string, string>).VITE_PUBLIC_EMAILJS_PUBLIC_KEY!;
+
   const [list, setList] = useState<Merchant[]>([]);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -30,8 +39,6 @@ export function AdminMerchants() {
     city: "",
     status: "actif" as "actif" | "inactif",
   });
-
-  /* ================= LOAD DATA ================= */
   useEffect(() => {
     setLoading(true);
     merchantService
@@ -41,13 +48,11 @@ export function AdminMerchants() {
       .finally(() => setLoading(false));
   }, []);
 
-  /* ================= FILTER ================= */
   const filtered = list.filter(m =>
-    m.name.toLowerCase().includes(search.toLowerCase()) ||
-    m.city.toLowerCase().includes(search.toLowerCase())
+    (m.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
+    (m.city ?? "").toLowerCase().includes(search.toLowerCase())
   );
 
-  /* ================= MODALS ================= */
   function openAdd() {
     setEditing(null);
     setForm({
@@ -71,8 +76,19 @@ export function AdminMerchants() {
     });
     setModalOpen(true);
   }
+   const sendEmailCode = async (email: string, code: string) => {
+    try {
+      await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        { to_email: email, code: code },
+        PUBLIC_KEY,
+      );
+    } catch (err) {
+      console.error("Erreur EmailJS :", err);
+    }
+  };
 
-  /* ================= SAVE ================= */
   async function handleSave() {
     if (!form.name.trim()) return;
 
@@ -81,14 +97,22 @@ export function AdminMerchants() {
         const updated = await merchantService.update(editing.id, form);
         setList(l => l.map(m => (m.id === updated.id ? updated : m)));
       } else {
-        const created = await merchantService.create(form);
-        setList(l => [
-          {
-            ...created,
-            avatarColor: created.avatarColor || COLORS[l.length % COLORS.length],
-          },
-          ...l,
-        ]);
+        const response = await merchantService.create(form);
+
+        const newMerchant: Merchant = {
+          ...response.merchant,
+          avatarColor:
+            response.merchant.avatarColor ||
+            COLORS[list.length % COLORS.length],
+        };
+
+        setList(l => [newMerchant, ...l]);
+
+        await sendEmailCode(response.merchant.email, response.generatedPassword);
+
+        alert(
+          `Commerçant créé !`
+        );
       }
       setModalOpen(false);
     } catch (e) {
@@ -96,7 +120,6 @@ export function AdminMerchants() {
     }
   }
 
-  /* ================= DELETE ================= */
   async function handleDelete(id: number) {
     try {
       await merchantService.delete(id);
@@ -107,7 +130,6 @@ export function AdminMerchants() {
     }
   }
 
-  /* ================= RENDER ================= */
   return (
     <Layout title="Commerçants" subtitle={`${list.length} commerçant(s) enregistré(s)`}>
       {/* Toolbar */}
@@ -129,7 +151,6 @@ export function AdminMerchants() {
               <th>Commerçant</th>
               <th>Contact</th>
               <th>Ville</th>
-              <th>Catégorie</th>
               <th>Ventes totales</th>
               <th>Statut</th>
               <th>Actions</th>
@@ -156,7 +177,7 @@ export function AdminMerchants() {
                   <div style={{ fontSize: '0.75rem', color: 'hsl(var(--muted-foreground))' }}>{m.phone}</div>
                 </td>
                 <td>{m.city}</td>
-                <td style={{ fontWeight: 600 }}>{m.totalSales.toLocaleString()} MAD</td>
+                <td style={{ fontWeight: 600 }}>{m.totalSales.toLocaleString()} produits</td>
                 <td>
                   <span className={m.status === 'actif' ? 'badge-validated' : 'badge-cancelled'} style={{
                     padding: '0.25rem 0.625rem', borderRadius: '99px', fontSize: '0.75rem', fontWeight: 600,

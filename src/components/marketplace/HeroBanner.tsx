@@ -16,7 +16,7 @@ const slides = [
   {
     image: heroBanner2,
     title: "Livraison Gratuite",
-    subtitle: "Sur toutes les commandes de plus de 50 000 FCFA",
+    subtitle: "Sur toutes les commandes de plus de 50 000 Ariary",
     cta: "Commander maintenant",
     link: "/products",
   },

@@ -3,6 +3,7 @@ import { promotionLoyaltyService } from '@/services';
 import { Layout } from '@/components/Layout';
 import type { PromotionLoyalty, PromotionLoyaltyRequest } from '@/data/mock-data';
 import { Plus, Pencil, Trash2, Search, Store } from "lucide-react";
+import { MerchantLayout } from '@/components/MerchantLayout';
 
 function PromotionModal({
   isOpen,
@@ -128,7 +129,7 @@ function PromotionModal({
   );
 }
 
-export function PromotionLoyalty() {
+export function MerchantPromotionLoyalty() {
   const [promotions, setPromotions] = useState<PromotionLoyalty[]>([]);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -171,7 +172,7 @@ export function PromotionLoyalty() {
   );
 
   return (
-    <Layout title="PromotionLoyalty" subtitle={`${promotions.length} promotion(s) enregistrée(s)`}>
+    <MerchantLayout title="PromotionLoyalty" subtitle={`${promotions.length} promotion(s) enregistrée(s)`}>
       {/* Toolbar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div className="search-bar">
@@ -244,6 +245,6 @@ export function PromotionLoyalty() {
         onSave={handleSave}
         initialData={editing || undefined}
       />
-    </Layout>
+    </MerchantLayout>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Layout } from '@/components/Layout';
+import { MerchantLayout } from "@/components/MerchantLayout";
 import { Product, ProductRequest, Merchant, CategoryResponse } from '@/data/mock-data';
 import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
 import { merchantProductService } from '@/services/merchantProductService';
@@ -7,7 +7,7 @@ import { merchantService } from '@/services/adminMerchantService';
 import { formatPrice } from '@/services/merchantProductService';
 import { categoryService } from '@/services/categorieService';
 
-export function AdminProducts() {
+export function MerchantProducts() {
   const [list, setList] = useState<Product[]>([]);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
@@ -134,13 +134,14 @@ export function AdminProducts() {
   };
 
   return (
-    <Layout title="Produits" subtitle={`${list.length} produit(s)`}>
+    <MerchantLayout title="Produits" subtitle={`${list.length} produit(s)`}>
       {/* --- Barre recherche et ajout --- */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div className="search-bar">
           <Search size={15} color="hsl(var(--muted-foreground))" />
           <input placeholder="Nom..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
+        <button className="btn-primary" onClick={openAdd}><Plus size={16} /> Ajouter un produit</button>
       </div>
 
       {/* --- Tableau produits --- */}
@@ -242,6 +243,6 @@ export function AdminProducts() {
           </div>
         </div>
       )}
-    </Layout>
+    </MerchantLayout>
   );
 }

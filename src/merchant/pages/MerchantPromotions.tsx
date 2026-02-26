@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Layout } from '@/components/Layout';
+import { MerchantLayout } from "@/components/MerchantLayout";
 import type { Product, Promotion, PromotionRequest, PromotionLoyalty, ProductItemResponse } from '@/data/mock-data';
 import { Plus, Pencil, Trash2, Gift, Tag } from 'lucide-react';
 import { promotionService, promotionLoyaltyService, productService } from '@/services';
@@ -10,7 +10,7 @@ const statusConfig: Record<string, { label: string; cls: string }> = {
   planifiée: { label: 'Planifiée', cls: 'badge-pending' },
 };
 
-export function AdminPromotions() {
+export function MerchantPromotions() {
   const [list, setList] = useState<Promotion[]>([]);
   const [promotionLoyalties, setPromotionLoyalties] = useState<PromotionLoyalty[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -97,7 +97,7 @@ export function AdminPromotions() {
   }
 
   return (
-    <Layout title="Promotions" subtitle="Gérez vos promotions et offres spéciales">
+    <MerchantLayout title="Promotions" subtitle="Gérez vos promotions et offres spéciales">
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.25rem' }}>
         <button className="btn-primary" onClick={openAdd}><Plus size={16} /> Créer une promotion</button>
       </div>
@@ -255,6 +255,6 @@ export function AdminPromotions() {
           </div>
         </div>
       )}
-    </Layout>
+    </MerchantLayout>
   );
 }
