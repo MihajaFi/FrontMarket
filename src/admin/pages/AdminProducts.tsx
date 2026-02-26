@@ -26,7 +26,6 @@ export function AdminProducts() {
   const [imagePreview, setImagePreview] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // --- Chargement produits et marchands ---
   useEffect(() => {
     fetchProducts();
     fetchMerchants();
@@ -61,7 +60,6 @@ export function AdminProducts() {
 
   const filtered = list.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
 
-  // --- Modal ouverture ajout ---
   function openAdd() {
     setEditing(null);
     setForm({
@@ -69,14 +67,13 @@ export function AdminProducts() {
       description: '',
       categoryId: categories[0]?.id || 0,
       merchantId: merchants[0]?.id || 0,
-      price: 0,
+      price: 120000,
       image: undefined
     });
     setImagePreview('');
     setModalOpen(true);
   }
 
-  // --- Modal ouverture édition ---
   function openEdit(p: Product) {
     const merchant = merchants.find(m => m.name === p.merchant);
     const category = categories.find(c => c.name === p.category);
@@ -93,7 +90,6 @@ export function AdminProducts() {
     setModalOpen(true);
   }
 
-  // --- Gestion image ---
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -103,7 +99,6 @@ export function AdminProducts() {
     reader.readAsDataURL(file);
   };
 
-  // --- Enregistrement produit ---
   const handleSave = async () => {
     if (!form.name || !form.categoryId || !form.merchantId || !form.price) {
       alert("Tous les champs obligatoires doivent être remplis !");
@@ -120,18 +115,16 @@ export function AdminProducts() {
       console.error("Erreur lors de l'enregistrement :", error);
       alert("Une erreur est survenue lors de l'enregistrement !");
     } finally {
-      // Toujours fermer le modal et rafraîchir la liste
       setModalOpen(false);
       fetchProducts();
     }
   };
 
-  // --- Suppression produit ---
   const handleDelete = async (id: number) => {
     if (!confirm("Voulez-vous vraiment supprimer ce produit ?")) return;
 
     try {
-      await merchantProductService.deleteProduct(id); // id déjà number
+      await merchantProductService.deleteProduct(id);
       fetchProducts();
       setDeleteId(null);
     } catch (error: any) {

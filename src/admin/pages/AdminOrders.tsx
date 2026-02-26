@@ -3,9 +3,6 @@ import { Layout } from "@/components/Layout";
 import { orderService, OrderResponse } from "@/services/orderService";
 import { Search, Eye, ShoppingCart } from "lucide-react";
 
-/* =======================
-   STATUTS BACKEND
-======================= */
 const STATUS_OPTIONS = ["PENDING", "PAID", "SHIPPED", "CANCELLED"] as const;
 
 const statusConfig: Record<
@@ -25,9 +22,6 @@ export function AdminOrders() {
   const [viewOrder, setViewOrder] = useState<OrderResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
-  /* =======================
-     LOAD ORDERS
-  ======================= */
   useEffect(() => {
     orderService
       .getAll()
@@ -36,9 +30,6 @@ export function AdminOrders() {
       .finally(() => setLoading(false));
   }, []);
 
-  /* =======================
-     FILTERS
-  ======================= */
   const filtered = list.filter(o => {
     const q = search.toLowerCase();
     return (
@@ -48,18 +39,13 @@ export function AdminOrders() {
     );
   });
 
-  /* =======================
-     STATUS UPDATE (BACKEND)
-  ======================= */
   async function updateStatus(id: number, status: OrderResponse["status"]) {
     try {
       const currentOrder = list.find(o => o.id === id);
       if (!currentOrder) return;
 
-      // Appel backend PATCH pour mise à jour partielle
       const updated = await orderService.updateStatus(id, status);
 
-      // Met à jour le state local
       setList(l => l.map(o => (o.id === id ? updated : o)));
       if (viewOrder?.id === id) {
         setViewOrder(updated);
@@ -206,9 +192,6 @@ export function AdminOrders() {
   );
 }
 
-/* =======================
-   ROW COMPONENT
-======================= */
 function Row({
   label,
   value,

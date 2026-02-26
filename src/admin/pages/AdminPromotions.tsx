@@ -55,7 +55,7 @@ export function AdminPromotions() {
     setEditing(p);
     setForm({
       promotionLoyalty: p.promotionLoyalty.id,
-      productItems: p.productItems.map(pid => ({ productId: Number(pid.id) })), // <-- conversion en number
+      productItems: p.productItems.map(pid => ({ productId: Number(pid.id) })),
       type: p.type,
       status: p.status,
     });
@@ -92,9 +92,9 @@ export function AdminPromotions() {
     });
   }
 
-function getProductNames(items: ProductItemResponse[]) {
-  return items.map(item => item.product?.name ?? 'Produit inconnu').join(', ') || 'Aucun produit';
-}
+  function getProductNames(items: ProductItemResponse[]) {
+    return items.map(item => item.product?.name ?? 'Produit inconnu').join(', ') || 'Aucun produit';
+  }
 
   return (
     <Layout title="Promotions" subtitle="Gérez vos promotions et offres spéciales">

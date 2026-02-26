@@ -3,7 +3,6 @@ import { promotionLoyaltyService } from '@/services';
 import { Layout } from '@/components/Layout';
 import type { PromotionLoyalty, PromotionLoyaltyRequest } from '@/data/mock-data';
 
-// Modal pour créer / éditer une promotion
 function PromotionModal({
   isOpen,
   closeModal,
@@ -34,18 +33,16 @@ function PromotionModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Préparer les dates au format ISO que Symfony comprend
     const payload: PromotionLoyaltyRequest = {
       promotion_type: form.promotion_type,
       value: form.value,
-      start_date: form.start_date ,
+      start_date: form.start_date,
       end_date: form.end_date,
       conditions: form.conditions
     };
 
     onSave(payload);
 
-    // Reset form
     setForm({
       promotion_type: '',
       value: 12,

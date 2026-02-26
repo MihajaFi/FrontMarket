@@ -30,8 +30,6 @@ export function AdminMerchants() {
     city: "",
     status: "actif" as "actif" | "inactif",
   });
-
-  /* ================= LOAD DATA ================= */
   useEffect(() => {
     setLoading(true);
     merchantService
@@ -41,13 +39,11 @@ export function AdminMerchants() {
       .finally(() => setLoading(false));
   }, []);
 
-  /* ================= FILTER ================= */
   const filtered = list.filter(m =>
     m.name.toLowerCase().includes(search.toLowerCase()) ||
     m.city.toLowerCase().includes(search.toLowerCase())
   );
 
-  /* ================= MODALS ================= */
   function openAdd() {
     setEditing(null);
     setForm({
@@ -71,8 +67,6 @@ export function AdminMerchants() {
     });
     setModalOpen(true);
   }
-
-  /* ================= SAVE ================= */
   async function handleSave() {
     if (!form.name.trim()) return;
 
@@ -96,7 +90,6 @@ export function AdminMerchants() {
     }
   }
 
-  /* ================= DELETE ================= */
   async function handleDelete(id: number) {
     try {
       await merchantService.delete(id);
@@ -107,7 +100,6 @@ export function AdminMerchants() {
     }
   }
 
-  /* ================= RENDER ================= */
   return (
     <Layout title="Commerçants" subtitle={`${list.length} commerçant(s) enregistré(s)`}>
       {/* Toolbar */}

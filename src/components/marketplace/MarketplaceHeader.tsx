@@ -34,10 +34,10 @@ const MarketplaceHeader = () => {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Main header */}
       <div className="bg-card border-b border-border shadow-sm">
-        <div className="container flex items-center gap-4 py-3">
-          {/* Logo */}
+        <div className="container flex items-center justify-between gap-4 py-3">
+
+          {/* Logo - gauche */}
           <Link to="/" className="flex items-center gap-1 shrink-0">
             <div className="w-8 h-8 rounded-lg marketplace-gradient flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm font-display">M+</span>
@@ -47,25 +47,34 @@ const MarketplaceHeader = () => {
             </span>
           </Link>
 
-          {/* Search bar */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
+          {/* Recherche - centre */}
+          <form onSubmit={handleSearch} className="flex-1 max-w-2xl mx-4">
             <div className="relative flex">
               <Input
                 placeholder="Rechercher un produit, une catégorie..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="rounded-r-none border-r-0 bg-muted/50 focus:bg-card"
+                className="rounded-r-none border-r-0 bg-muted/50 focus:bg-card w-full"
               />
-              <Button type="submit" size="icon" className="rounded-l-none marketplace-gradient border-0 text-primary-foreground shrink-0">
+              <Button
+                type="submit"
+                size="icon"
+                className="rounded-l-none marketplace-gradient border-0 text-primary-foreground shrink-0"
+              >
                 <Search className="h-4 w-4" />
               </Button>
             </div>
           </form>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1">
+          {/* Actions - droite */}
+          <div className="flex items-center gap-4">
+            {/* Panier */}
             <Link to="/cart">
-              <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative text-muted-foreground hover:text-primary"
+              >
                 <ShoppingCart className="h-5 w-5" />
                 {totalItems > 0 && (
                   <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px] marketplace-gradient border-0 text-primary-foreground">
@@ -75,26 +84,35 @@ const MarketplaceHeader = () => {
               </Button>
             </Link>
 
+            {/* Connexion */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="default" size="sm">
-                <User className="mr-1 h-4 w-4" />
-                Connexion
-              </Button>
+                <Button variant="default" size="sm" className="flex items-center gap-1">
+                  <User className="h-4 w-4" /> Connexion
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 {isAuthenticated ? (
                   <>
-                    <div className="px-2 py-1.5 text-sm font-medium text-foreground">{user?.name}</div>
+                    <div className="px-2 py-1.5 text-sm font-medium text-foreground">
+                      {user?.name}
+                    </div>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/orders" className="flex items-center gap-2"><Package className="h-4 w-4" /> Mes commandes</Link>
+                      <Link to="/orders" className="flex items-center gap-2">
+                        <Package className="h-4 w-4" /> Mes commandes
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/loyalty" className="flex items-center gap-2"><Star className="h-4 w-4" /> Points fidélité</Link>
+                      <Link to="/loyalty" className="flex items-center gap-2">
+                        <Star className="h-4 w-4" /> Points fidélité
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-destructive">
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 text-destructive"
+                    >
                       <LogOut className="h-4 w-4" /> Se déconnecter
                     </DropdownMenuItem>
                   </>
@@ -111,14 +129,13 @@ const MarketplaceHeader = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {/* Menu mobile */}
             <Button variant="ghost" size="icon" className="md:hidden text-muted-foreground">
               <Menu className="h-5 w-5" />
             </Button>
           </div>
         </div>
       </div>
-
-      {/* Categories bar */}
     </header>
   );
 };

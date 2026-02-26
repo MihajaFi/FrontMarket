@@ -15,7 +15,6 @@ export function AdminStock() {
   const [form, setForm] = useState<StockRequest>({ quantity: 0, alert: '', productId: 0 });
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  // --- Load stocks ---
   useEffect(() => {
     async function fetchStocks() {
       setLoading(true);
@@ -41,27 +40,25 @@ export function AdminStock() {
     fetchProducts();
   }, []);
 
-  // --- Filtered list ---
   const filtered = list.filter(s =>
     s.productName.toLowerCase().includes(search.toLowerCase()) ||
     s.description.toLowerCase().includes(search.toLowerCase())
   );
 
-  // --- Status counts ---
   const ruptureCount = list.filter(s => s.alert.toLowerCase() === 'rupture').length;
   const lowCount = list.filter(s => s.alert.toLowerCase() === 'faible').length;
   const okCount = list.filter(s => s.alert.toLowerCase() === 'disponible').length;
 
-  // --- Handlers ---
+
   function openAdd() {
-  setEditing(null);
-  setForm({ 
-    quantity: 0, 
-    alert: '', 
-    productId: Number(products[0]?.id) || 0 // Force type number
-  });
-  setModalOpen(true);
-}
+    setEditing(null);
+    setForm({
+      quantity: 0,
+      alert: '',
+      productId: Number(products[0]?.id) || 0
+    });
+    setModalOpen(true);
+  }
 
   function openEdit(stock: StockResponse) {
     setEditing(stock);
