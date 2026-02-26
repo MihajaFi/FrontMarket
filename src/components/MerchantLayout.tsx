@@ -10,7 +10,6 @@ const navItems = [
     {
         section: 'GESTION',
         items: [
-            { label: 'Commerçants', icon: Store, path: '/merchant/merchants' },
             { label: 'Promotions Type', icon: Tag, path: '/merchant/promotion-loyalty' },
             { label: 'Produits', icon: Package, path: '/merchant/products' },
             { label: 'Categories', icon: Package, path: '/merchant/categories' },

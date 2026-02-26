@@ -18,7 +18,7 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./admin/dashboard/AdminDashboard";
 import MerchantDashboard from "./merchant/dashboard/MerchantDashboard";
 import { AdminMerchants, AdminProducts, AdminOrders, AdminPromotions, AdminStock, PromotionLoyalty, AdminCategories } from "./admin/pages";
-import { MerchantDash, MerchantProducts, MerchantOrders, MerchantPromotions, MerchantStock, MerchantPromotionLoyalty, MerchantCategories } from "./merchant/pages";
+import { MerchantProducts, MerchantOrders, MerchantPromotions, MerchantStock, MerchantPromotionLoyalty, MerchantCategories } from "./merchant/pages";
 import AdminRoute from "./routes/AdminRoute";
 import MerchantRoute from "./routes/MerchantRoute";
 
@@ -58,7 +58,6 @@ const App = () => (
               
               {/* Merchant routes */}
               <Route path="/merchant/dashboard" element={<MerchantRoute><MerchantDashboard /></MerchantRoute>} />
-              <Route path="/merchant/merchants" element={<MerchantRoute><MerchantDash /></MerchantRoute>} />
               <Route path="/merchant/products" element={<MerchantRoute><MerchantProducts /></MerchantRoute>} />
               <Route path="/merchant/orders" element={<MerchantRoute><MerchantOrders /></MerchantRoute>} />
               <Route path="/merchant/promotions" element={<MerchantRoute><MerchantPromotions /></MerchantRoute>} />

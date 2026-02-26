@@ -142,7 +142,7 @@ export interface CategoryResponse {
 export interface CategoryRequest {
   name: string;            // champ obligatoire
   description: string;     // champ obligatoire
-  color?: string | null;   // champ optionnel (peut être null)
+  color?: string;  // champ optionnel (peut être null)
 }
 
 export interface DashboardResponse {
