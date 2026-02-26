@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search } from "lucide-react";
 import { categoryService } from "@/services/categorieService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ import {
 import { Layout } from "@/components/Layout";
 import type { CategoryResponse, CategoryRequest } from "@/data/mock-data";
 
+
 export function AdminCategories() {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [open, setOpen] = useState(false);
@@ -30,6 +31,7 @@ export function AdminCategories() {
   const [color, setColor] = useState("");
   const [loading, setLoading] = useState(false);
   const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetchCategories();
@@ -95,67 +97,96 @@ export function AdminCategories() {
 
   return (
     <Layout title="Catégories" subtitle="Gérez les catégories de produits">
-      <div>
-        {/* Header + bouton ajouter */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-heading text-2xl font-bold">Catégories</h1>
-            <p className="text-muted-foreground">Gérez les catégories de produits</p>
-          </div>
-
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" /> Nouvelle catégorie
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{editingCategoryId ? "Modifier la catégorie" : "Ajouter une catégorie"}</DialogTitle>
-              </DialogHeader>
-              <form className="space-y-4" onSubmit={handleSaveCategory}>
-                <div>
-                  <Label>Nom de la catégorie</Label>
-                  <Input
-                    placeholder="Ex: Électronique"
-                    className="mt-1"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label>Description</Label>
-                  <Input
-                    placeholder="Ex: Produits électroniques"
-                    className="mt-1"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label>Couleur</Label>
-                  <Input
-                    placeholder="Ex: #FF0000"
-                    className="mt-1"
-                    value={color}
-                    onChange={(e) => setColor(e.target.value)}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Sauvegarde..." : editingCategoryId ? "Modifier" : "Enregistrer"}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+      {/* Toolbar */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1.25rem',
+          flexWrap: 'wrap',
+          gap: '0.75rem'
+        }}
+      >
+        {/* Search */}
+        <div className="search-bar">
+          <Search size={15} color="hsl(var(--muted-foreground))" />
+          <input
+            placeholder="Rechercher..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
+
+        {/* Dialog */}
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nouvelle catégorie
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {editingCategoryId
+                  ? "Modifier la catégorie"
+                  : "Ajouter une catégorie"}
+              </DialogTitle>
+            </DialogHeader>
+
+            <form className="space-y-4" onSubmit={handleSaveCategory}>
+              <div>
+                <Label>Nom de la catégorie</Label>
+                <Input
+                  placeholder="Ex: Électronique"
+                  className="mt-1"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label>Description</Label>
+                <Input
+                  placeholder="Ex: Produits électroniques"
+                  className="mt-1"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <Label>Couleur</Label>
+                <Input
+                  placeholder="Ex: #FF0000"
+                  className="mt-1"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading
+                  ? "Sauvegarde..."
+                  : editingCategoryId
+                    ? "Modifier"
+                    : "Enregistrer"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <div>
 
         {/* Table des catégories */}
         <div className="mt-6 rounded-xl border bg-card shadow-card">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Icône</TableHead>
+                <TableHead>Description</TableHead>
                 <TableHead>Nom</TableHead>
                 <TableHead>Nombre de produits</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -164,7 +195,7 @@ export function AdminCategories() {
             <TableBody>
               {categories.map((cat) => (
                 <TableRow key={cat.id}>
-                  <TableCell className="text-2xl">{cat.description || "📦"}</TableCell>
+                  <TableCell>{cat.description || "📦"}</TableCell>
                   <TableCell className="font-medium">{cat.name}</TableCell>
                   <TableCell>{cat.productCount ?? 0}</TableCell>
                   <TableCell className="text-right flex justify-end gap-2">
