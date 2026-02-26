@@ -9,10 +9,11 @@ const axiosClient = axios.create({
   timeout: 10000,
 });
 
-// 🔑 Ajouter le token UNIQUEMENT pour routes protégées
+// 🔑 Ajouter le token pour tous les endpoints protégés
 axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("mc_token");
 
+  // Liste des endpoints publics
   const publicEndpoints = [
     "/products",
     "/product",
@@ -20,6 +21,7 @@ axiosClient.interceptors.request.use((config) => {
     "/register",
   ];
 
+  // Si ce n'est pas un endpoint public, ajouter le token
   const isPublic = publicEndpoints.some((path) =>
     config.url?.startsWith(path)
   );
@@ -31,21 +33,15 @@ axiosClient.interceptors.request.use((config) => {
   return config;
 });
 
-// ⚠️ Redirection seulement si token expiré sur route protégée
+// ⚠️ Redirection si token expiré ou invalide
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
     const token = localStorage.getItem("mc_token");
-    const url = error.config?.url || "";
 
-    const protectedEndpoints = ["/orders", "/checkout", "/loyalty"];
-
-    const isProtected = protectedEndpoints.some((p) =>
-      url.includes(p)
-    );
-
-    if (status === 401 && token && isProtected) {
+    // Si 401 et qu'il y avait un token, redirection vers login
+    if (status === 401 && token) {
       localStorage.removeItem("mc_token");
       localStorage.removeItem("mc_user");
       window.location.href = "/login";

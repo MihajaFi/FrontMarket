@@ -5,6 +5,7 @@ import { formatPrice } from "@/data/mock-data";
 import { Button } from "@/components/ui/button";
 import { Trash2, Minus, Plus, ShoppingBag, ArrowRight } from "lucide-react";
 
+const VITE_IMAGE = import.meta.env.VITE_IMAGE || "";
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
 
@@ -38,7 +39,7 @@ const Cart = () => {
             {items.map(({ product, quantity }) => (
               <div key={product.id} className="bg-card border border-border rounded-lg p-4 flex gap-4">
                 <Link to={`/product/${product.id}`} className="shrink-0">
-                  <img src={product.image} alt={product.name} className="w-20 h-20 rounded-md object-cover" />
+                  <img src={`${VITE_IMAGE}${product.image}`} alt={product.name} className="w-20 h-20 rounded-md object-cover" />
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link to={`/product/${product.id}`}>
@@ -46,7 +47,7 @@ const Cart = () => {
                       {product.name}
                     </h3>
                   </Link>
-                  <p className="text-xs text-muted-foreground">{product.merchant}</p>
+                  <p className="text-xs text-muted-foreground">{product.description}</p>
                   <p className="font-display font-bold text-primary mt-1">{formatPrice(product.price)}</p>
                   <div className="flex items-center justify-between mt-2">
                     <div className="flex items-center border border-border rounded-md">
@@ -98,5 +99,4 @@ const Cart = () => {
     </MarketplaceLayout>
   );
 };
-
 export default Cart;

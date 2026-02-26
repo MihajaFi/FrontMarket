@@ -105,5 +105,4 @@ const Loyalty = () => {
     </MarketplaceLayout>
   );
 };
-
 export default Loyalty;

@@ -1,74 +1,116 @@
 import axiosClient from "@/api/axiosClient";
-import type { CartItem } from "@/context/CartContext";
+import type { OrderAndOrderItemRequest } from "@/data/mock-data";
 
-export type OrderStatus = "pending" | "confirmed" | "shipping" | "delivered" | "cancelled";
-
-export interface Order {
-  id: string;
-  items: { productName: string; quantity: number; price: number; image: string }[];
-  total: number;
-  status: OrderStatus;
-  address: string;
-  phone: string;
-  paymentMethod: string;
-  createdAt: string;
+export interface OrderItemResponse {
+  id: number;
+  quantity: number;
+  unit_price: number;
+  sub_total: number;
+  product_name: string;
+  product_description: string;
+  product_price: number;
 }
 
-// In-memory mock store
-const mockOrders: Order[] = [];
-let orderId = 1000;
+export interface OrderResponse {
+  id: number;
+  orderDate: string;
+  totalAmount: number;
+  status: "PENDING" | "PAID" | "SHIPPED" | "CANCELLED";
+  userName: string;
+  merchantName: string;
+  address: string;
+  phone: string;
+  paymentMethod: "MVOLA" | "ORANGEMONEY" | "AIRTELMONEY";
+  items: OrderItemResponse[];
+}
 
 export const orderService = {
-  async createOrder(payload: {
-    items: CartItem[];
-    address: string;
-    phone: string;
-    paymentMethod: string;
-    total: number;
-  }): Promise<Order> {
-    try {
-      const { data } = await axiosClient.post("/orders", payload);
-      return data;
-    } catch {
-      const order: Order = {
-        id: `CMD-${++orderId}`,
-        items: payload.items.map((i) => ({
-          productName: i.product.name,
-          quantity: i.quantity,
-          price: i.product.price,
-          image: i.product.image,
-        })),
-        total: payload.total,
-        status: "pending",
-        address: payload.address,
-        phone: payload.phone,
-        paymentMethod: payload.paymentMethod,
-        createdAt: new Date().toISOString(),
-      };
-      mockOrders.unshift(order);
-      return order;
-    }
+
+  // ✅ CREATE
+  create: async (
+    order: OrderAndOrderItemRequest
+  ): Promise<OrderResponse> => {
+    const response = await axiosClient.post("/orders", order);
+    return response.data as OrderResponse;
   },
 
-  async getMyOrders(): Promise<Order[]> {
-    try {
-      const { data } = await axiosClient.get("/orders/my-orders");
-      return data;
-    } catch {
-      return [...mockOrders];
-    }
+  // GET ALL
+  getAll: async (): Promise<OrderResponse[]> => {
+    const response = await axiosClient.get("/orders");
+
+    return response.data.map((o: any) => ({
+      id: o.id,
+      orderDate: o.order_date,
+      totalAmount: o.total_amount,
+      status: o.status,
+      userName: o.user_name,
+      merchantName: o.merchant_name ?? "", // si pas envoyé
+      address: o.address,
+      phone: o.phone,
+      paymentMethod: o.payment_method,
+      items: o.items,
+    }));
+  },
+  getMyOrders: async (): Promise<OrderResponse[]> => {
+    const response = await axiosClient.get("/orders/me", {
+      withCredentials: true, // nécessaire si tu relies à la session Symfony
+    });
+    return response.data.map((o: any) => ({
+      id: o.id,
+      orderDate: o.orderDate ?? o.order_date,
+      totalAmount: o.totalAmount ?? o.total_amount,
+      status: o.status,
+      userName: o.userName ?? o.user_name,
+      merchantName: o.merchantName ?? o.merchant_name ?? "",
+      address: o.address,
+      phone: o.phone,
+      paymentMethod: o.paymentMethod ?? o.payment_method,
+      items: o.items.map((i: any) => ({
+        id: i.id,
+        quantity: i.quantity,
+        unit_price: i.unit_price ?? i.product_price,
+        sub_total: i.sub_total ?? i.quantity * i.unit_price,
+        product_name: i.product_name ?? i.productName,
+        product_description: i.product_description ?? i.productDescription,
+        product_price: i.product_price ?? i.unit_price,
+      })),
+    }));
   },
 
-  async cancelOrder(id: string): Promise<Order> {
-    try {
-      const { data } = await axiosClient.put(`/orders/${id}/cancel`);
-      return data;
-    } catch {
-      const order = mockOrders.find((o) => o.id === id);
-      if (!order) throw new Error("Commande introuvable");
-      if (order.status !== "pending") throw new Error("Seules les commandes en attente peuvent être annulées");
-      order.status = "cancelled";
-      return order;
-    }
+  // GET BY ID
+  getById: async (id: number): Promise<OrderResponse> => {
+    const response = await axiosClient.get(`/orders/${id}`);
+    const o = response.data;
+
+    return {
+      id: o.id,
+      orderDate: o.order_date,
+      totalAmount: o.total_amount,
+      status: o.status,
+      userName: o.user_name,
+      merchantName: o.merchant_name ?? "",
+      address: o.address,
+      phone: o.phone,
+      paymentMethod: o.payment_method,
+      items: o.items,
+    };
+  },
+
+  // UPDATE
+  update: async (
+    id: number,
+    order: OrderAndOrderItemRequest
+  ): Promise<OrderResponse> => {
+    const response = await axiosClient.put(`/orders/${id}`, order);
+    return response.data as OrderResponse;
+  },
+  updateStatus: async (id: number, status: OrderResponse["status"]): Promise<OrderResponse> => {
+  const response = await axiosClient.patch(`/orders/${id}/status`, { status });
+  return response.data;
+  },
+  // DELETE
+  delete: async (id: number): Promise<{ message: string }> => {
+    const response = await axiosClient.delete(`/orders/${id}`);
+    return response.data;
   },
 };

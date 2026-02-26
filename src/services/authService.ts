@@ -4,7 +4,7 @@ export interface User {
   id: string;
   name: string;   // correspond à username dans Symfony
   email: string;
-  role: "client"; // tu peux adapter si roles multiples
+  roles: string[]; // tu peux adapter si roles multiples
 }
 
 interface AuthResponse {

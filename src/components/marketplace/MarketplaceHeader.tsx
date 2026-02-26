@@ -34,21 +34,6 @@ const MarketplaceHeader = () => {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Top bar */}
-      <div className="bg-secondary">
-        <div className="container flex items-center justify-between py-2">
-          <p className="text-xs text-secondary-foreground/80">
-            🚚 Livraison gratuite dès 50 000 FCFA d'achat !
-          </p>
-          <div className="hidden md:flex items-center gap-4 text-xs text-secondary-foreground/80">
-            {isAuthenticated && (
-              <span className="text-primary font-medium">Bonjour, {user?.name?.split(" ")[0]}</span>
-            )}
-            <Link to="/help" className="hover:text-primary transition-colors">Aide</Link>
-          </div>
-        </div>
-      </div>
-
       {/* Main header */}
       <div className="bg-card border-b border-border shadow-sm">
         <div className="container flex items-center gap-4 py-3">
@@ -79,10 +64,6 @@ const MarketplaceHeader = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="hidden md:flex text-muted-foreground hover:text-primary">
-              <Heart className="h-5 w-5" />
-            </Button>
-
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-primary">
                 <ShoppingCart className="h-5 w-5" />
@@ -96,9 +77,10 @@ const MarketplaceHeader = () => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
-                  <User className="h-5 w-5" />
-                </Button>
+                <Button variant="default" size="sm">
+                <User className="mr-1 h-4 w-4" />
+                Connexion
+              </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 {isAuthenticated ? (
@@ -137,19 +119,6 @@ const MarketplaceHeader = () => {
       </div>
 
       {/* Categories bar */}
-      <div className="bg-card border-b border-border">
-        <div className="container">
-          <nav className="flex items-center gap-1 overflow-x-auto py-2 scrollbar-hide">
-            <Link
-              to="/products"
-              className="shrink-0 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
-            >
-              Tous
-            </Link>
-            
-          </nav>
-        </div>
-      </div>
     </header>
   );
 };
