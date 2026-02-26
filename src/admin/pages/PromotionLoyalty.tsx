@@ -18,7 +18,7 @@ function PromotionModal({
   const [form, setForm] = useState<PromotionLoyaltyRequest>(
     initialData || {
       promotion_type: '',
-      value: 0,
+      value: 12,
       start_date: '',
       end_date: '',
       conditions: ''

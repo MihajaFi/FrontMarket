@@ -25,10 +25,9 @@ const Checkout = () => {
   const [momoNumber, setMomoNumber] = useState("");
   const [momoProvider, setMomoProvider] = useState("orange");
   const [loading, setLoading] = useState(false);
-  const [orderId, setOrderId] = useState<string>(""); // pour afficher la confirmation
+  const [orderId, setOrderId] = useState<string>("");
 
   if (isLoading) {
-    // On peut afficher un loader ou rien du tout
     return (
       <MarketplaceLayout>
         <div className="container py-16 text-center">

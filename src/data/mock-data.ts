@@ -75,13 +75,14 @@ export interface PromotionLoyaltyRequest {
   end_date : string; 
   conditions : string;
 }
-
-
-
+export interface ProductItemResponse {
+  id: number;
+  product: Product;
+}
 export interface Promotion {
   id : number;
   promotionLoyalty : PromotionLoyalty;
-  productItems : Product[];
+  productItems : ProductItemResponse[];
   type: 'percentage' | 'fixed';
   status: 'active' | 'expirée' | 'planifiée';
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Layout } from '@/components/Layout';
-import type { Product, Promotion, PromotionRequest, PromotionLoyalty } from '@/data/mock-data';
+import type { Product, Promotion, PromotionRequest, PromotionLoyalty, ProductItemResponse } from '@/data/mock-data';
 import { Plus, Pencil, Trash2, Gift, Tag } from 'lucide-react';
 import { promotionService, promotionLoyaltyService, productService } from '@/services';
 
@@ -52,15 +52,15 @@ export function AdminPromotions() {
   }
 
   function openEdit(p: Promotion) {
-  setEditing(p);
-  setForm({
-    promotionLoyalty: p.promotionLoyalty.id,
-    productItems: p.productItems.map(pid => ({ productId: Number(pid.id) })), // <-- conversion en number
-    type: p.type,
-    status: p.status,
-  });
-  setModalOpen(true);
- }
+    setEditing(p);
+    setForm({
+      promotionLoyalty: p.promotionLoyalty.id,
+      productItems: p.productItems.map(pid => ({ productId: Number(pid.id) })), // <-- conversion en number
+      type: p.type,
+      status: p.status,
+    });
+    setModalOpen(true);
+  }
 
   async function handleSave() {
     if (!form.promotionLoyalty || form.productItems.length === 0) return;
@@ -92,9 +92,9 @@ export function AdminPromotions() {
     });
   }
 
-  function getProductNames(items: Product[]) {
-    return items.map(p => p.name).join(', ') || 'Aucun produit';
-  }
+function getProductNames(items: ProductItemResponse[]) {
+  return items.map(item => item.product?.name ?? 'Produit inconnu').join(', ') || 'Aucun produit';
+}
 
   return (
     <Layout title="Promotions" subtitle="Gérez vos promotions et offres spéciales">
@@ -135,7 +135,7 @@ export function AdminPromotions() {
                 <span style={{
                   fontSize: '2rem', fontWeight: 900, color: 'hsl(var(--primary))', lineHeight: 1,
                 }}>
-                  -{promo.type === 'percentage' ? promo.promotionLoyalty.value + '%' : promo.promotionLoyalty.value + ' MAD'}
+                  -{promo.type === 'percentage' ? promo.promotionLoyalty.value + '%' : promo.promotionLoyalty.value + ' Ar'}
                 </span>
               </div>
 
@@ -185,7 +185,7 @@ export function AdminPromotions() {
                   onChange={e => setForm(f => ({ ...f, type: e.target.value as any }))}
                 >
                   <option value="percentage">Pourcentage (%)</option>
-                  <option value="fixed">Fixe (MAD)</option>
+                  <option value="fixed">Fixe (Ar)</option>
                 </select>
               </div>
 
@@ -216,10 +216,10 @@ export function AdminPromotions() {
                         fontWeight: 600,
                         border: 'none',
                         cursor: 'pointer',
-                        background: form.productItems.some(pi => pi.productId === Number (p.id))
+                        background: form.productItems.some(pi => pi.productId === Number(p.id))
                           ? 'hsl(var(--primary))'
                           : 'hsl(var(--muted))',
-                        color: form.productItems.some(pi => pi.productId === Number (p.id))
+                        color: form.productItems.some(pi => pi.productId === Number(p.id))
                           ? 'white'
                           : 'hsl(var(--muted-foreground))',
                         transition: 'all 0.15s',

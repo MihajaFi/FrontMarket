@@ -16,7 +16,7 @@ import OrderTracking from "./pages/OrderTracking";
 import Loyalty from "./pages/Loyalty";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./admin/dashboard/AdminDashboard";
-import { AdminMerchants, AdminProducts, AdminOrders, AdminPromotions, AdminStock, PromotionLoyalty } from "./admin/pages";
+import { AdminMerchants, AdminProducts, AdminOrders, AdminPromotions, AdminStock, PromotionLoyalty, AdminCategories } from "./admin/pages";
 import AdminRoute from "./routes/AdminRoute";
 
 const queryClient = new QueryClient();
@@ -51,7 +51,7 @@ const App = () => (
               <Route path="/admin/promotions" element={<AdminRoute><AdminPromotions /></AdminRoute>} />
               <Route path="/admin/stock" element={<AdminRoute><AdminStock /></AdminRoute>} />
               <Route path="/admin/promotion-loyalty" element={<AdminRoute><PromotionLoyalty /></AdminRoute>} />
-
+              <Route path="/admin/categories" element={<AdminRoute><AdminCategories /></AdminRoute>} />
               {/* Fallback */}
               <Route path="*" element={<NotFound />} />
             </Routes>

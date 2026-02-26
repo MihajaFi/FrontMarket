@@ -11,8 +11,9 @@ const navItems = [
     section: 'GESTION',
     items: [
       { label: 'Commerçants', icon: Store, path: '/admin/merchants' },
-      { label: 'Catégories', icon: Tag, path: '/admin/promotion-loyalty' },
+      { label: 'Promotions Type', icon: Tag, path: '/admin/promotion-loyalty' },
       { label: 'Produits', icon: Package, path: '/admin/products' },
+      { label: 'Categories', icon: Package, path: '/admin/categories' },
     ],
   },
   {
