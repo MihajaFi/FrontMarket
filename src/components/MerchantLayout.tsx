@@ -4,7 +4,7 @@ import {
     LayoutDashboard, Store, Tag, Package, ShoppingCart,
     BarChart2, Gift, Menu, X, TrendingUp, Bell, ChevronDown
 } from 'lucide-react';
-
+import Logo from '@/assets/Logo.png';
 const navItems = [
     { label: 'Tableau de bord', icon: LayoutDashboard, path: '/merchant/dashboard' },
     {
@@ -51,25 +51,26 @@ export function MerchantLayout({ children, title, subtitle }: LayoutProps) {
                 style={{ transform: sidebarOpen || window.innerWidth >= 1024 ? 'translateX(0)' : 'translateX(-100%)' }}>
 
                 {/* Logo */}
-                <div style={{
-                    padding: '1.25rem 1.5rem',
-                    borderBottom: '1px solid hsl(var(--sidebar-border))',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                }}>
-                    <div style={{
-                        width: '2.25rem', height: '2.25rem',
-                        background: 'hsl(var(--primary))',
+                <div
+                    style={{
+                        width: '3rem',
+                        height: '3rem',
                         borderRadius: '0.5rem',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                        <TrendingUp size={18} color="white" />
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'white', lineHeight: 1.2 }}>CommerceHub</div>
-                        <div style={{ fontSize: '0.7rem', color: 'hsl(var(--sidebar-text))', letterSpacing: '0.05em' }}>Gestion Commerciale</div>
-                    </div>
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'transparent', // on peut garder transparent si l'image a son fond
+                    }}
+                >
+                    <img
+                        src={Logo}
+                        alt="Logo MarketCom+"
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'contain',
+                        }}
+                    />
                 </div>
 
                 {/* Nav */}
@@ -135,7 +136,7 @@ export function MerchantLayout({ children, title, subtitle }: LayoutProps) {
                                     textOverflow: 'ellipsis',
                                 }}
                             >
-                                Admin
+                                Merchant
                             </div>
                             <div
                                 style={{
@@ -143,7 +144,7 @@ export function MerchantLayout({ children, title, subtitle }: LayoutProps) {
                                     color: 'hsl(var(--sidebar-text))',
                                 }}
                             >
-                                Administrateur
+                                Commerçant
                             </div>
                         </div>
                     </div>

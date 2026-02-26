@@ -141,7 +141,6 @@ export function AdminProducts() {
           <Search size={15} color="hsl(var(--muted-foreground))" />
           <input placeholder="Nom..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
-        <button className="btn-primary" onClick={openAdd}><Plus size={16} /> Ajouter un produit</button>
       </div>
 
       {/* --- Tableau produits --- */}

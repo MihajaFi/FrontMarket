@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { promotionLoyaltyService } from '@/services';
 import { Layout } from '@/components/Layout';
 import type { PromotionLoyalty, PromotionLoyaltyRequest } from '@/data/mock-data';
+import { Plus, Pencil, Trash2, Search, Store } from "lucide-react";
 
 function PromotionModal({
   isOpen,
@@ -171,38 +172,32 @@ export function PromotionLoyalty() {
 
   return (
     <Layout title="PromotionLoyalty" subtitle={`${promotions.length} promotion(s) enregistrée(s)`}>
-      <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Promotions de fidélité</h1>
-
-        <div className="flex justify-between mb-4">
-          <input
-            type="text"
-            placeholder="Rechercher par type"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="border p-2 rounded w-1/2"
-          />
-          <button
-            className="bg-green-500 text-white px-4 py-2 rounded"
-            onClick={() => {
-              setEditing(null);
-              setModalOpen(true);
-            }}
-          >
-            Ajouter
-          </button>
+      {/* Toolbar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+        <div className="search-bar">
+          <Search size={15} color="hsl(var(--muted-foreground))" />
+          <input placeholder="Rechercher..." value={search} onChange={e => setSearch(e.target.value)} />
         </div>
+        <button className="btn-primary" onClick={() => {
+          setEditing(null);
+          setModalOpen(true);
+        }}>
+          <Plus size={16} /> Ajouter
+        </button>
+      </div>
 
-        <table className="w-full border-collapse border">
+      {/* Table */}
+      <div className="data-table">
+        <table>
           <thead>
             <tr className="bg-gray-100">
-              <th className="border p-2">ID</th>
-              <th className="border p-2">Type</th>
-              <th className="border p-2">Valeur</th>
-              <th className="border p-2">Début</th>
-              <th className="border p-2">Fin</th>
-              <th className="border p-2">Conditions</th>
-              <th className="border p-2">Actions</th>
+              <th >ID</th>
+              <th >Type</th>
+              <th >Valeur</th>
+              <th >Début</th>
+              <th >Fin</th>
+              <th >Conditions</th>
+              <th >Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -215,13 +210,13 @@ export function PromotionLoyalty() {
             )}
             {filteredPromotions.map(p => (
               <tr key={p.id}>
-                <td className="border p-2">{p.id}</td>
-                <td className="border p-2">{p.promotion_type}</td>
-                <td className="border p-2">{p.value}</td>
-                <td className="border p-2">{p.start_date}</td>
-                <td className="border p-2">{p.end_date}</td>
-                <td className="border p-2">{p.conditions}</td>
-                <td className="border p-2 space-x-2">
+                <td>{p.id}</td>
+                <td>{p.promotion_type}</td>
+                <td>{p.value}</td>
+                <td>{p.start_date}</td>
+                <td>{p.end_date}</td>
+                <td>{p.conditions}</td>
+                <td className=" space-x-2">
                   <button
                     className="bg-yellow-400 text-white px-2 py-1 rounded"
                     onClick={() => {
@@ -242,14 +237,13 @@ export function PromotionLoyalty() {
             ))}
           </tbody>
         </table>
-
-        <PromotionModal
-          isOpen={modalOpen}
-          closeModal={() => setModalOpen(false)}
-          onSave={handleSave}
-          initialData={editing || undefined}
-        />
       </div>
+      <PromotionModal
+        isOpen={modalOpen}
+        closeModal={() => setModalOpen(false)}
+        onSave={handleSave}
+        initialData={editing || undefined}
+      />
     </Layout>
   );
 }

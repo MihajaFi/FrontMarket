@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Store, Tag, Package, ShoppingCart,
   BarChart2, Gift, Menu, TrendingUp, Bell, ChevronDown
 } from 'lucide-react';
-
+import Logo from '@/assets/Logo.png';
 const navItems = [
   { label: 'Tableau de bord', icon: LayoutDashboard, path: '/admin/dashboard' },
   {
@@ -48,7 +48,7 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
-      
+
       {/* Sidebar */}
       <aside
         className={`sidebar ${sidebarOpen ? '' : 'sidebar-hidden'}`}
@@ -60,6 +60,7 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
         }}
       >
         {/* Logo */}
+        {/* Logo */}
         <div
           style={{
             padding: '1.25rem 1.5rem',
@@ -69,19 +70,30 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
             gap: '0.75rem',
           }}
         >
+          {/* Logo image */}
           <div
             style={{
-              width: '2.25rem',
-              height: '2.25rem',
-              background: 'hsl(var(--primary))',
+              width: '3rem',
+              height: '3rem',
               borderRadius: '0.5rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              background: 'transparent', // on peut garder transparent si l'image a son fond
             }}
           >
-            <TrendingUp size={18} color="white" />
+            <img
+              src={Logo}
+              alt="Logo MarketCom+"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+              }}
+            />
           </div>
+
+          {/* Texte */}
           <div>
             <div
               style={{
@@ -91,7 +103,7 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
                 lineHeight: 1.2,
               }}
             >
-              CommerceHub
+              MarketCom +
             </div>
             <div
               style={{
@@ -121,9 +133,8 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`sidebar-link ${
-                  location.pathname === item.path ? 'active' : ''
-                }`}
+                className={`sidebar-link ${location.pathname === item.path ? 'active' : ''
+                  }`}
                 onClick={() => setSidebarOpen(false)}
               >
                 <item.icon size={18} />
@@ -143,9 +154,8 @@ export function Layout({ children, title, subtitle }: LayoutProps) {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`sidebar-link ${
-                      location.pathname === item.path ? 'active' : ''
-                    }`}
+                    className={`sidebar-link ${location.pathname === item.path ? 'active' : ''
+                      }`}
                     onClick={() => setSidebarOpen(false)}
                   >
                     <item.icon size={18} />
