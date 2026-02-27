@@ -1,5 +1,5 @@
 import axiosClient from "@/api/axiosClient";
-import { type Product, type ProductRequest } from "@/data/mock-data";
+import { type Product, type ProductRequest, type StockByCategoryResponse } from "@/data/mock-data";
 
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat("fr-FR").format(price) + " Ar";
@@ -93,4 +93,22 @@ export const merchantProductService = {
       throw new Error("Product not found");
     }
   },
+  async getProductsByMerchant(merchantId: number): Promise<any> {
+    try {
+      const { data } = await axiosClient.get(`/products/merchant/${merchantId}`);
+      return data;
+    } catch (error) {
+      console.error(`Failed to fetch merchant with id ${merchantId}:`, error);
+      throw new Error("Merchant not found");
+    }
+  },
+  async getStockByCategory(): Promise<StockByCategoryResponse[]> {
+    try {
+      const { data } = await axiosClient.get("/products/stock/category");
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch stock by category:", error);
+      throw new Error("Failed to fetch stock by category");
+    }
+  }
 };

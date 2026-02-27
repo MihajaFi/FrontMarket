@@ -12,7 +12,12 @@ export const merchantService = {
     const { data } = await axiosClient.get<Merchant>(`/merchants/${id}`);
     return data;
   },
-
+  async getByEmail(email: string): Promise<Merchant> {
+    const { data } = await axiosClient.get<Merchant>(
+      `/merchants/email/${encodeURIComponent(email)}`
+    );
+    return data;
+  },
   async create(merchant: MerchantCreate): Promise<{
     merchant: Merchant;
     generatedPassword: string;
