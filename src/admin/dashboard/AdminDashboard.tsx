@@ -64,11 +64,12 @@ export default function AdminDashboard() {
   });
 
   const lowStock = stockByCategory.reduce((acc, s) => acc + (s.stock < 20 ? 1 : 0), 0);
-
+  const totalSales = salesByMonth.reduce((sum, month) => sum + month.ventes, 0);
+  const totalSalesFormatted = (totalSales / 1000).toFixed(0); // en "k Ar"
   const statCards = [
     {
       label: 'Total des ventes',
-      value: `${dashboard.totalSell.toLocaleString()} Ar`,
+      value: `${totalSalesFormatted}k Ar`,
       icon: TrendingUp,
       iconBg: 'hsl(var(--stat-sales) / 0.12)',
       iconColor: 'hsl(var(--stat-sales))',
@@ -175,54 +176,54 @@ export default function AdminDashboard() {
                   <Cell key={i} fill={COLORS[i % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(v: number) => [`${v.toLocaleString()} Ar`]} />
+              <Tooltip formatter={(v: number) => [`${v.toLocaleString()} Vente`]} />
             </PieChart>
           </ResponsiveContainer>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', marginTop: '0.25rem' }}>
-                      {salesByMerchant.slice(0, 4).map((m, i) => (
-                        <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem' }}>
-                          <div style={{ width: 10, height: 10, borderRadius: 3, background: COLORS[i], flexShrink: 0 }} />
-                          <span style={{ flex: 1, color: 'hsl(var(--muted-foreground))', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
-                          <span style={{ fontWeight: 600 }}>{m.totalSales}v</span>
-                        </div>
-                      ))}
-                    </div>
+            {salesByMerchant.slice(0, 4).map((m, i) => (
+              <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem' }}>
+                <div style={{ width: 10, height: 10, borderRadius: 3, background: COLORS[i], flexShrink: 0 }} />
+                <span style={{ flex: 1, color: 'hsl(var(--muted-foreground))', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
+                <span style={{ fontWeight: 600 }}>{m.totalSales}v</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-       {/* Charts Row 2 */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-              {/* Orders bar chart */}
-              <div className="chart-card">
-                <div className="chart-title">Commandes mensuelles</div>
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={salesByMonth} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(214 32% 88%)" />
-                    <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Bar dataKey="commandes" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Commandes" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-      
-              {/* Stock by category */}
-              <div className="chart-card">
-                <div className="chart-title">Stock par catégorie</div>
-                <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={stockByCategory} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(214 32% 88%)" horizontal={false} />
-                    <XAxis type="number" tick={{ fontSize: 11 }} />
-                    <YAxis type="category" dataKey="category" tick={{ fontSize: 11 }} width={80} />
-                    <Tooltip />
-                    <Bar dataKey="stock" radius={[0, 4, 4, 0]} name="Stock">
-                      {stockByCategory.map((s, i) => (
-                        <Cell key={i} fill={s.stock === 0 ? '#ef4444' : s.stock < 20 ? '#f59e0b' : '#10b981'} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+      {/* Charts Row 2 */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+        {/* Orders bar chart */}
+        <div className="chart-card">
+          <div className="chart-title">Commandes mensuelles</div>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={salesByMonth} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(214 32% 88%)" />
+              <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip />
+              <Bar dataKey="commandes" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Commandes" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Stock by category */}
+        <div className="chart-card">
+          <div className="chart-title">Stock par catégorie</div>
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={stockByCategory} layout="vertical" margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(214 32% 88%)" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 11 }} />
+              <YAxis type="category" dataKey="category" tick={{ fontSize: 11 }} width={80} />
+              <Tooltip />
+              <Bar dataKey="stock" radius={[0, 4, 4, 0]} name="Stock">
+                {stockByCategory.map((s, i) => (
+                  <Cell key={i} fill={s.stock === 0 ? '#ef4444' : s.stock < 20 ? '#f59e0b' : '#10b981'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
 
 
       {/* Orders Table */}

@@ -12,6 +12,7 @@ const totalSales = salesByMonth.reduce((s, m) => s + m.ventes, 0);
 const lowStock = products.filter(p => p.status !== 'disponible').length;
 const pendingOrders = orders.filter(o => o.status === 'en_attente').length;
 
+
 const statCards = [
   {
     label: 'Total des ventes',
