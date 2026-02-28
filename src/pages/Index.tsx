@@ -22,6 +22,7 @@ const Index = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [loading, setLoading] = useState(true);
+  const [promotions, setPromotions] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,6 +34,21 @@ const Index = () => {
 
         setProducts(productsData);
         setCategories(categoriesData);
+
+
+        const promoMap: Record<string, number> = {};
+        await Promise.all(
+          productsData.map(async (p) => {
+            try {
+              const promo = await productService.getPromotionLoyalty(p.id.toString());
+              promoMap[p.id] = promo.value;
+            } catch {
+              promoMap[p.id] = 0;
+            }
+          })
+        );
+        setPromotions(promoMap);
+
       } catch (error) {
         console.error("Erreur chargement homepage:", error);
       } finally {
@@ -130,7 +146,7 @@ const Index = () => {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {products.slice(0, 8).map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ProductCard key={p.id} product={p} promotionValue={promotions[p.id] || 0} />
               ))}
             </div>
           )}
@@ -152,6 +168,7 @@ const Index = () => {
               </Button>
             </Link>
           </div>
+          
         </section>
       </div>
     </MarketplaceLayout>

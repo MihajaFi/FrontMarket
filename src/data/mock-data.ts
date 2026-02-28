@@ -176,6 +176,19 @@ export interface StockByCategoryResponse {
   stock: number;
 }
 
+export interface PromotionLoyaltyResponse {
+  id: number;
+  promotionType: string;
+  description: string;
+  value: number;
+  startDate: string;
+  endDate: string;
+  conditions: string;
+}
+
+export interface ProductLoyalty extends Product {
+  loyaltyValue: number;
+}
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat("fr-FR").format(price) + " Ar";
 };
