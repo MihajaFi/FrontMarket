@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import MarketplaceLayout from "@/components/marketplace/MarketplaceLayout";
 import HeroBanner from "@/components/marketplace/HeroBanner";
 import ProductCard from "@/components/marketplace/ProductCard";
-import { ArrowRight, Truck, Shield, Headphones, CreditCard } from "lucide-react";
+import { ArrowRight, Truck, Shield, Headphones, CreditCard, Shirt, Laptop, Monitor, Book } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -58,7 +58,20 @@ const Index = () => {
 
     fetchData();
   }, []);
-
+  const getCategoryIcon = (catName: string) => {
+  switch (catName.toLowerCase()) {
+    case "vetement":
+      return <Shirt className="w-6 h-6 text-white" />;
+    case "electronique":
+      return <Laptop className="w-6 h-6 text-white" />;
+    case "mobilier":
+      return <Monitor className="w-6 h-6 text-white" />;
+    case "livre":
+      return <Book className="w-6 h-6 text-white" />;
+    default:
+      return <span className="text-white font-bold">{catName.charAt(0).toUpperCase()}</span>;
+  }
+};
   return (
     <MarketplaceLayout>
       <div className="container py-4 space-y-8">
@@ -105,9 +118,9 @@ const Index = () => {
                     {/* Cercle couleur dynamique */}
                     <div
                       className="w-12 h-12 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                      style={{ backgroundColor: cat.color }}
+                      style={{ backgroundColor:  "#6b7280" }}
                     >
-                      {cat.name.charAt(0).toUpperCase()}
+                      {getCategoryIcon(cat.name)}
                     </div>
 
                     <span className="font-heading text-sm font-semibold">
