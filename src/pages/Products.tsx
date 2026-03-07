@@ -5,17 +5,13 @@ import ProductCard from "@/components/marketplace/ProductCard";
 import { productService } from "@/services/productService";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { LayoutGrid, List, SlidersHorizontal } from "lucide-react";
-import { Product } from "@/data/mock-data";
+  LayoutGrid,
+  List
+} from "lucide-react";
+import type { Product } from "@/data/mock-data";
 
 const Products = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<(Product & { promotionValue?: number })[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [searchParams] = useSearchParams();
@@ -28,12 +24,24 @@ const Products = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [error, setError] = useState<string | null>(null);
 
-  // Récupérer les produits depuis l'API
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const data = await productService.getProducts();
-        setProducts(data);
+
+        // Ajouter la promotion pour chaque produit
+        const productsWithPromo = await Promise.all(
+          data.map(async (p) => {
+            try {
+              const promo = await productService.getPromotionLoyalty(p.id.toString());
+              return { ...p, promotionValue: promo.value };
+            } catch {
+              return { ...p, promotionValue: 0 };
+            }
+          })
+        );
+
+        setProducts(productsWithPromo);
       } catch (err) {
         setError("Échec du chargement des produits.");
         console.error(err);
@@ -47,37 +55,46 @@ const Products = () => {
 
   const filtered = useMemo(() => {
     let result = [...products];
+
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) 
+          p.category.toLowerCase().includes(q)
       );
     }
+
     if (selectedCategory) {
       result = result.filter((p) => p.category === selectedCategory);
     }
-   
+
+    if (discountOnly) {
+      result = result.filter((p) => (p.promotionValue || 0) > 0);
+    }
+
     switch (sortBy) {
       case "price-asc":
-        result.sort((a, b) => a.price - b.price);
+        result.sort((a, b) => (a.price || 0) - (b.price || 0));
         break;
       case "price-desc":
-        result.sort((a, b) => b.price - a.price);
+        result.sort((a, b) => (b.price || 0) - (a.price || 0));
         break;
     }
+
     return result;
   }, [products, selectedCategory, discountOnly, sortBy, searchQuery]);
 
   if (loading) {
     return (
       <MarketplaceLayout>
-        <div className="container py-12 text-center text-muted-foreground">Chargement des produits...</div>
+        <div className="container py-12 text-center text-muted-foreground">
+          Chargement des produits...
+        </div>
       </MarketplaceLayout>
     );
   }
- 
+
   return (
     <MarketplaceLayout>
       <div className="container py-6">
@@ -127,7 +144,11 @@ const Products = () => {
                 }
               >
                 {filtered.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    promotionValue={product.promotionValue}
+                  />
                 ))}
               </div>
             )}
@@ -137,4 +158,5 @@ const Products = () => {
     </MarketplaceLayout>
   );
 };
+
 export default Products;

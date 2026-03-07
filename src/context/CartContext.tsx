@@ -4,11 +4,12 @@ import { Product } from "@/data/mock-data";
 export interface CartItem {
   product: Product;
   quantity: number;
+  promotionValue?: number; // ← ajouté
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, quantity?: number) => void;
+  addToCart: (product: Product, quantity?: number, promotionValue?: number) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -21,17 +22,17 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  const addToCart = useCallback((product: Product, quantity = 1) => {
+  const addToCart = useCallback((product: Product, quantity = 1, promotionValue?: number) => {
     setItems((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);
       if (existing) {
         return prev.map((item) =>
           item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: item.quantity + quantity, promotionValue }
             : item
         );
       }
-      return [...prev, { product, quantity }];
+      return [...prev, { product, quantity, promotionValue }];
     });
   }, []);
 
@@ -54,10 +55,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const clearCart = useCallback(() => setItems([]), []);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+
+  // Calcul du prix total en tenant compte de la promotion
+  const totalPrice = items.reduce((sum, item) => {
+    const finalPrice = item.product.price ? Math.max(item.product.price - (item.promotionValue || 0), 0) : 0;
+    return sum + finalPrice * item.quantity;
+  }, 0);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice }}>
+    <CartContext.Provider
+      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice }}
+    >
       {children}
     </CartContext.Provider>
   );

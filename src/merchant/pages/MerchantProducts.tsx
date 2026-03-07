@@ -2,14 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { MerchantLayout } from "@/components/MerchantLayout";
 import { Product, ProductRequest, Merchant, CategoryResponse } from '@/data/mock-data';
 import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
-import { merchantProductService } from '@/services/merchantProductService';
+import { merchantProductService, formatPrice } from '@/services/merchantProductService';
 import { merchantService } from '@/services/adminMerchantService';
-import { formatPrice } from '@/services/merchantProductService';
 import { categoryService } from '@/services/categorieService';
 
 export function MerchantProducts() {
   const [list, setList] = useState<Product[]>([]);
-  const [merchants, setMerchants] = useState<Merchant[]>([]);
+  const [merchant, setMerchant] = useState<Merchant | null>(null);
   const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -26,20 +25,41 @@ export function MerchantProducts() {
   const [imagePreview, setImagePreview] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const getCurrentUser = () => {
+    const user = localStorage.getItem("mc_user");
+    return user ? JSON.parse(user) : null;
+  };
+
   useEffect(() => {
-    fetchProducts();
-    fetchMerchants();
+    fetchCurrentMerchant();
     fetchCategories();
   }, []);
 
-  const fetchProducts = async () => {
+  const fetchCurrentMerchant = async () => {
     try {
-      const data = await merchantProductService.getProducts();
+      const user = getCurrentUser();
+      if (!user) return;
+
+      const merchantData = await merchantService.getByEmail(user.email);
+      setMerchant(merchantData);
+
+      setForm(f => ({ ...f, merchantId: merchantData.id }));
+
+      await fetchProducts(merchantData.id);
+    } catch (error) {
+      console.error("Erreur chargement marchand :", error);
+    }
+  };
+
+  const fetchProducts = async (merchantId: number) => {
+    try {
+      const data = await merchantProductService.getProductsByMerchant(merchantId);
       setList(data);
     } catch (error) {
       console.error("Erreur chargement produits :", error);
     }
   };
+
   const fetchCategories = async () => {
     try {
       const data = await categoryService.getAll();
@@ -49,46 +69,38 @@ export function MerchantProducts() {
     }
   };
 
-  const fetchMerchants = async () => {
-    try {
-      const data = await merchantService.getAll();
-      setMerchants(data);
-    } catch (error) {
-      console.error("Erreur chargement marchands :", error);
-    }
-  };
-
   const filtered = list.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
 
-  function openAdd() {
+  const openAdd = () => {
+    if (!merchant) return;
+
     setEditing(null);
     setForm({
       name: '',
       description: '',
       categoryId: categories[0]?.id || 0,
-      merchantId: merchants[0]?.id || 0,
+      merchantId: merchant.id,
       price: 120000,
       image: undefined
     });
     setImagePreview('');
     setModalOpen(true);
-  }
+  };
 
-  function openEdit(p: Product) {
-    const merchant = merchants.find(m => m.name === p.merchant);
+  const openEdit = (p: Product) => {
     const category = categories.find(c => c.name === p.category);
     setEditing(p);
     setForm({
       name: p.name,
       description: p.description,
       categoryId: category ? category.id : 0,
-      merchantId: merchant ? merchant.id : 0,
+      merchantId: merchant?.id || 0,
       price: p.price || 0,
       image: undefined
     });
     setImagePreview(p.image || '');
     setModalOpen(true);
-  }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -111,12 +123,14 @@ export function MerchantProducts() {
       } else {
         await merchantProductService.createProduct(form);
       }
+
+      if (merchant) await fetchProducts(merchant.id);
+
     } catch (error) {
       console.error("Erreur lors de l'enregistrement :", error);
       alert("Une erreur est survenue lors de l'enregistrement !");
     } finally {
       setModalOpen(false);
-      fetchProducts();
     }
   };
 
@@ -125,7 +139,7 @@ export function MerchantProducts() {
 
     try {
       await merchantProductService.deleteProduct(id);
-      fetchProducts();
+      if (merchant) await fetchProducts(merchant.id);
       setDeleteId(null);
     } catch (error: any) {
       console.error("Échec suppression produit id", id, error.response?.data || error);
@@ -135,7 +149,7 @@ export function MerchantProducts() {
 
   return (
     <MerchantLayout title="Produits" subtitle={`${list.length} produit(s)`}>
-      {/* --- Barre recherche et ajout --- */}
+      {/* Barre recherche et ajout */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div className="search-bar">
           <Search size={15} color="hsl(var(--muted-foreground))" />
@@ -144,7 +158,7 @@ export function MerchantProducts() {
         <button className="btn-primary" onClick={openAdd}><Plus size={16} /> Ajouter un produit</button>
       </div>
 
-      {/* --- Tableau produits --- */}
+      {/* Tableau produits */}
       <div className="data-table">
         <table>
           <thead>
@@ -168,7 +182,7 @@ export function MerchantProducts() {
                 </td>
                 <td>{p.name}</td>
                 <td>{p.category}</td>
-                <td>{p.merchant}</td>
+                <td>{merchant?.name}</td>
                 <td>{p.price ? formatPrice(p.price) : '-'}</td>
                 <td style={{ display: 'flex', gap: 6 }}>
                   <button className="btn-icon btn-icon-edit" onClick={() => openEdit(p)}><Pencil size={13} /></button>
@@ -180,7 +194,7 @@ export function MerchantProducts() {
         </table>
       </div>
 
-      {/* --- Modal ajout / édition --- */}
+      {/* Modal ajout / édition */}
       {modalOpen && (
         <div className="modal-overlay" onClick={() => setModalOpen(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 560 }}>
@@ -199,26 +213,7 @@ export function MerchantProducts() {
                 ))}
               </select>
               <label>Commerçant *</label>
-              <select
-                className="form-input"
-                value={form.merchantId}
-                onChange={e =>
-                  setForm(f => ({
-                    ...f,
-                    merchantId: Number(e.target.value)
-                  }))
-                }
-              >
-                {merchants.length === 0 ? (
-                  <option value={0}>Aucun commerçant</option>
-                ) : (
-                  merchants.map(m => (
-                    <option key={m.id} value={m.id}>
-                      {m.name}
-                    </option>
-                  ))
-                )}
-              </select>
+              <input className="form-input" value={merchant?.name} disabled />
               <label>Image</label>
               <input type="file" ref={fileInputRef} onChange={handleFileChange} />
               {imagePreview && <img src={imagePreview} alt="preview" style={{ width: 80, height: 80, objectFit: 'cover', marginTop: 4 }} />}
@@ -231,7 +226,7 @@ export function MerchantProducts() {
         </div>
       )}
 
-      {/* --- Modal suppression --- */}
+      {/* Modal suppression */}
       {deleteId !== null && (
         <div className="modal-overlay" onClick={() => setDeleteId(null)}>
           <div className="modal-box" onClick={e => e.stopPropagation()}>

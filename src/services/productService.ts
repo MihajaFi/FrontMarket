@@ -1,5 +1,5 @@
 import axiosClient from "@/api/axiosClient";
-import { type Product, type ProductRequest } from "@/data/mock-data";
+import type { Product,  ProductRequest, PromotionLoyaltyResponse } from "@/data/mock-data";
 
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat("fr-FR").format(price) + " Ar";
@@ -84,4 +84,19 @@ export const productService = {
       throw new Error("Product not found");
     }
   },
+
+  async getPromotionLoyalty(productId: string): Promise<PromotionLoyaltyResponse> {
+  try {
+    const { data } = await axiosClient.get(
+      `/products/${productId}/loyalty`
+    );
+    return data;
+  } catch (error) {
+    console.error(
+      `Failed to fetch loyalty promotions for product ${productId}:`,
+      error
+    );
+    throw new Error("Failed to fetch loyalty promotions");
+  }
+}
 };

@@ -9,9 +9,12 @@ const VITE_IMAGE = import.meta.env.VITE_IMAGE || "";
 
 interface ProductCardProps {
   product: Product;
+  promotionValue?: number;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, promotionValue }: ProductCardProps) {
+  const finalPrice =
+    promotionValue && promotionValue > 0 ? product.price - promotionValue : product.price;
   const { addToCart } = useCart();
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -23,7 +26,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       return;
     }
 
-    addToCart(product);
+    addToCart(product, 1, promotionValue);
     toast.success(`${product.name} ajouté au panier`);
   };
 
@@ -85,8 +88,14 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
 
         <div className="mt-3 flex items-center justify-between">
+          {promotionValue && promotionValue > 0 && (
+            <span className="text-sm line-through text-muted-foreground mr-2">
+              {formatPrice(product.price)}
+            </span>
+          )}
+          {/* Prix final */}
           <span className="font-heading text-lg font-bold text-primary">
-            {product.price ? formatPrice(product.price) : "Prix sur demande"}
+            {formatPrice(finalPrice)}
           </span>
 
           <Button

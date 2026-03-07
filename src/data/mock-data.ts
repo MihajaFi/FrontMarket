@@ -140,9 +140,9 @@ export interface CategoryResponse {
 }
 
 export interface CategoryRequest {
-  name: string;            // champ obligatoire
-  description: string;     // champ obligatoire
-  color?: string;  // champ optionnel (peut être null)
+  name: string;
+  description: string;
+  color?: string;
 }
 
 export interface DashboardResponse {
@@ -152,6 +152,43 @@ export interface DashboardResponse {
   orderPending: number;
 }
 
+export interface SalesByMonthResponse {
+  month: string; 
+  ventes: number;
+  commandes: number;
+}
+
+export interface sellResponse {
+  id: number;
+  merchantId: number;
+  productId: number;
+  totalSales: number;
+  saleDate: string;
+}
+
+export interface totalSaleByMerchantResponse {
+  name: string;
+  totalSales: number;
+}
+
+export interface StockByCategoryResponse {
+  category: string;
+  stock: number;
+}
+
+export interface PromotionLoyaltyResponse {
+  id: number;
+  promotionType: string;
+  description: string;
+  value: number;
+  startDate: string;
+  endDate: string;
+  conditions: string;
+}
+
+export interface ProductLoyalty extends Product {
+  loyaltyValue: number;
+}
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat("fr-FR").format(price) + " Ar";
 };

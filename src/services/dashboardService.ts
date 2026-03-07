@@ -1,5 +1,17 @@
+// services/dashboardService.ts
 import axiosClient from "@/api/axiosClient";
-import type { DashboardResponse } from "@/data/mock-data";
+import type { DashboardResponse, SalesByMonthResponse, totalSaleByMerchantResponse } from "@/data/mock-data";
+
+export interface MerchantSale {
+  id: number;
+  name: string;
+  totalSales: number;
+}
+
+export interface SalesByMonth {
+  month: string; // ex: "2026-02"
+  totalSales: number;
+}
 
 export const dashboardService = {
   async getDashboard(): Promise<DashboardResponse> {
@@ -12,13 +24,23 @@ export const dashboardService = {
     }
   },
 
-  async getTotalSaleByMerchant(): Promise<any[]> {
+  async getTotalSaleByMerchant(): Promise<totalSaleByMerchantResponse[]> {
     try {
-      const { data } = await axiosClient.get<any[]>("/dashboard/merchants");
+      const { data } = await axiosClient.get<totalSaleByMerchantResponse[]>("/dashboard/merchants");
       return data;
     } catch (error: any) {
       console.error("Failed to fetch total sales by merchant:", error.response || error);
       throw new Error(error.response?.data?.message || "Failed to fetch merchant sales");
+    }
+  },
+
+  async getSalesByMonth(): Promise<SalesByMonthResponse[]> {
+    try {
+      const { data } = await axiosClient.get<SalesByMonthResponse[]>("/dashboard/sales-by-month");
+      return data;
+    } catch (error: any) {
+      console.error("Failed to fetch sales by month:", error.response || error);
+      throw new Error(error.response?.data?.message || "Failed to fetch sales by month");
     }
   },
 };
